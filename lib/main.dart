@@ -158,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   return Text(
-                    "Error= ${messages[index]}",
+                    "Error= ${errorlist[index]}",
                     style: const TextStyle(fontSize: 8, color: Colors.black),
                   );
                 },
