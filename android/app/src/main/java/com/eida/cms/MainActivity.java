@@ -1,5 +1,5 @@
 
-package com.eida.flutter_eida_toolkit;
+package com.eida.cms;
 
 
 import android.content.Intent;
@@ -9,15 +9,15 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.eida.flutter_eida_toolkit.tasks.AppController;
-import com.eida.flutter_eida_toolkit.tasks.CardReaderConnectionTask;
-import com.eida.flutter_eida_toolkit.tasks.CheckCardStatusAsync;
-import com.eida.flutter_eida_toolkit.tasks.Constants;
-import com.eida.flutter_eida_toolkit.tasks.GetFingerIndexAsync;
-import com.eida.flutter_eida_toolkit.tasks.InitializeToolkitTask;
-import com.eida.flutter_eida_toolkit.tasks.ReaderCardDataAsync;
-import com.eida.flutter_eida_toolkit.tasks.ReaderCardDataListener;
-import com.eida.flutter_eida_toolkit.tasks.VerifyBiometricAsync;
+import com.eida.cms.tasks.AppController;
+import com.eida.cms.tasks.CardReaderConnectionTask;
+import com.eida.cms.tasks.CheckCardStatusAsync;
+import com.eida.cms.tasks.Constants;
+import com.eida.cms.tasks.GetFingerIndexAsync;
+import com.eida.cms.tasks.InitializeToolkitTask;
+import com.eida.cms.tasks.ReaderCardDataAsync;
+import com.eida.cms.tasks.ReaderCardDataListener;
+import com.eida.cms.tasks.VerifyBiometricAsync;
 
 import org.json.JSONException;
 import org.json.JSONObject;

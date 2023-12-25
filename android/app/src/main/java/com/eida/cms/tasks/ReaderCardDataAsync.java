@@ -1,4 +1,4 @@
-package com.eida.flutter_eida_toolkit.tasks;
+package com.eida.cms.tasks;
 
 import android.nfc.Tag;
 import android.os.AsyncTask;
@@ -37,6 +37,7 @@ public class ReaderCardDataAsync extends AsyncTask<Void, Integer, Integer> {
         boolean bReadPhotography = true;
         boolean bSignatureImage = true;
         boolean bReadAddress = true;
+
         try {
             if (tag != null) {
                 cardReader = ConnectionController.initConnection(tag);

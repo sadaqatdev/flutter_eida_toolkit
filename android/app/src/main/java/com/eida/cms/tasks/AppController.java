@@ -1,4 +1,4 @@
-package com.eida.flutter_eida_toolkit.tasks;
+package com.eida.cms.tasks;
 
 
 import android.app.Application;
@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
-public class AppController extends Application {
+import io.flutter.app.FlutterApplication;
+
+public class AppController extends FlutterApplication {
 
     public static String VG_URL = "";
 

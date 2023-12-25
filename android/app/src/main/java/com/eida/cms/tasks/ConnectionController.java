@@ -1,4 +1,4 @@
-package com.eida.flutter_eida_toolkit.tasks;
+package com.eida.cms.tasks;
 
 import android.content.Context;
 import android.nfc.Tag;
@@ -42,7 +42,9 @@ public class ConnectionController {
                 Logger.d("set configPath Success");
 
                 Context context = AppController.getContext();
+
                 StringBuilder configBuilder = new StringBuilder();
+
                 configBuilder.append("\n" + "config_directory =" + AppController.path);
                 configBuilder.append("\n" + "log_directory =" + stringConfigPath);
                 configBuilder.append("\n" + "read_publicdata_offline = false");
@@ -52,6 +54,7 @@ public class ConnectionController {
                     configBuilder.append("\n" + "vg_url =" + AppController.VG_URL);
                 }
                 String pluginDirectorPath = context.getApplicationInfo().nativeLibraryDir + "/";
+
                 configBuilder.append("\n" + "plugin_directory_path =" + pluginDirectorPath);
 
                 Logger.d("configBuilder ::" + configBuilder);
@@ -59,7 +62,7 @@ public class ConnectionController {
                 GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
 
                 GrabbaFingerprintPlugin.getInstance(); // Required if Fingerprint scanning is needed
-
+                
                 toolkit = new Toolkit(true, configBuilder.toString(), context);
 //                GrabbaFingerprintPlugin.getInstance(); //  Required if Fingerprint scanning is needed
                 Logger.d("Toolkit init success ");
