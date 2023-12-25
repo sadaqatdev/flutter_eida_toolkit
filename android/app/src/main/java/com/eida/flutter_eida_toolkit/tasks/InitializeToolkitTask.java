@@ -19,6 +19,7 @@ public class InitializeToolkitTask extends AsyncTask<Void, Integer, String> {
     protected String doInBackground(Void... voids) {
         String statusMessage = null;
         try {
+            
             isToolkitInitialized = ConnectionController.initialize();
 
             statusMessage = "Toolkit Successfully initialized.";

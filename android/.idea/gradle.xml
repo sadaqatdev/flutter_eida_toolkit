@@ -19,6 +19,7 @@
         <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
         <option name="modules">
           <set>
+            <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/permission_handler_android-11.1.0/android" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/EIDAToolkit" />
             <option value="$PROJECT_DIR$/android-sdk-tactivo-plugins" />

@@ -4,12 +4,8 @@ import android.content.Context;
 import android.nfc.Tag;
 import android.text.TextUtils;
 
-import com.grabba.eida.plugin.Fingerprint;
-import com.grabba.eida.plugin.Smartcard;
-
-
-//import com.grabba.GrabbaFingerprintPlugin;
-//import com.grabba.GrabbaSmartcardPlugin;
+import com.grabba.GrabbaFingerprintPlugin;
+import com.grabba.GrabbaSmartcardPlugin;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,8 +56,9 @@ public class ConnectionController {
 
                 Logger.d("configBuilder ::" + configBuilder);
 
-//                 GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
-//                GrabbaFingerprintPlugin.getInstance(); // Required if Fingerprint scanning is needed
+                GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
+
+                GrabbaFingerprintPlugin.getInstance(); // Required if Fingerprint scanning is needed
 
                 toolkit = new Toolkit(true, configBuilder.toString(), context);
 //                GrabbaFingerprintPlugin.getInstance(); //  Required if Fingerprint scanning is needed

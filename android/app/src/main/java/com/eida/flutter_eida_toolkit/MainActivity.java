@@ -349,7 +349,14 @@ public class MainActivity extends FlutterActivity {
         super.configureFlutterEngine(flutterEngine);
         EidaToolkitPlugin.EidaToolkitConnect.setUp(flutterEngine.getDartExecutor().getBinaryMessenger(), new EidaToolkitConnectImpl());
         eidaToolkitData = new EidaToolkitPlugin.EidaToolkitData(flutterEngine.getDartExecutor().getBinaryMessenger());
+        init();
+    }
 
+    private void init() {
+        File outDir = new File(AppController.path);
+        if (!outDir.exists()) {
+            outDir.mkdirs();
+        }//
     }
 
 
