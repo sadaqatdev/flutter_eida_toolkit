@@ -3,14 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'edia/eida_toolkit.dart';
 
+var errorlist = [];
+
 void main() {
   PlatformDispatcher.instance.onError = (error, stack) {
+    //
+    errorlist.add(error);
+
+    errorlist.add(stack);
+
     print(error);
     print(stack);
     return true;
   };
   FlutterError.onError = (details) {
     print(details);
+    errorlist.add(details);
   };
   runApp(const MyApp());
 }
@@ -50,12 +58,12 @@ class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
   void initState() {
     EidaToolkitData.setup(_MyHomePageState());
     Future.delayed(Duration.zero).then((value) {
-      getPermision();
+      getPermission();
     });
     super.initState();
   }
 
-  getPermision() async {
+  getPermission() async {
     await Permission.camera.request();
     await Permission.storage.request();
     await Permission.location.request();
@@ -76,61 +84,87 @@ class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            MaterialButton(
-              onPressed: () {
-                eidaToolkitConnect.connectAndInitializeF();
-              },
-              child: const Text("Connect and initialize"),
-            ),
-            MaterialButton(
-              onPressed: () {
-                eidaToolkitConnect.onClickLoadFingerDataF();
-              },
-              child: const Text("onClickLoadFingerDataF"),
-            ),
-            MaterialButton(
-              onPressed: () {
-                eidaToolkitConnect.onClickCheckCardStatusF();
-              },
-              child: const Text("onClickCheckCardStatusF"),
-            ),
-            MaterialButton(
-              onPressed: () {
-                eidaToolkitConnect.onClickFingerVerifyF();
-              },
-              child: const Text("onClickFingerVerifyF"),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            const Text("Status Data"),
-            ListView.builder(
-              itemCount: messages.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return Row(
-                  children: [
-                    Text(
-                      "Status= ${messages[index].$1}",
-                      style: const TextStyle(fontSize: 14, color: Colors.black),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      "Message= ${messages[index].$2}",
-                      style: const TextStyle(fontSize: 14, color: Colors.black),
-                    ),
-                  ],
-                );
-              },
-            )
-          ],
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              MaterialButton(
+                onPressed: () {
+                  eidaToolkitConnect.connectAndInitializeF();
+                },
+                child: const Text("Connect and initialize"),
+              ),
+              MaterialButton(
+                onPressed: () {
+                  eidaToolkitConnect.onClickLoadFingerDataF();
+                },
+                child: const Text("onClickLoadFingerDataF"),
+              ),
+              MaterialButton(
+                onPressed: () {
+                  eidaToolkitConnect.onClickCheckCardStatusF();
+                },
+                child: const Text("onClickCheckCardStatusF"),
+              ),
+              MaterialButton(
+                onPressed: () {
+                  eidaToolkitConnect.onClickFingerVerifyF();
+                },
+                child: const Text("onClickFingerVerifyF"),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              const Text("Status Data"),
+              ListView.builder(
+                itemCount: messages.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return Row(
+                    children: [
+                      Text(
+                        "Status= ${messages[index].$1}",
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.black),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        "Message= ${messages[index].$2}",
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.black),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              Row(
+                children: [
+                  const Text("Errors Data"),
+                  MaterialButton(
+                    onPressed: () {
+                      setState(() {});
+                    },
+                    child: const Text("Refersh"),
+                  ),
+                ],
+              ),
+              ListView.builder(
+                itemCount: errorlist.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return Text(
+                    "Error= ${messages[index]}",
+                    style: const TextStyle(fontSize: 8, color: Colors.black),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
