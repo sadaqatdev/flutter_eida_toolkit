@@ -1,0 +1,4 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('idt-tactivo-driver-release.aar'))
+artifacts.add("default", file('idt-pcsc-driver-release.aar'))
+artifacts.add("default", file('idt-plugin-identos.aar'))
