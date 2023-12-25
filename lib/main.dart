@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'edia/eida_toolkit.dart';
 
 void main() {
@@ -48,7 +49,24 @@ class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
   @override
   void initState() {
     EidaToolkitData.setup(_MyHomePageState());
+    Future.delayed(Duration.zero).then((value) {
+      getPermision();
+    });
     super.initState();
+  }
+
+  getPermision() async {
+    await Permission.camera.request();
+    await Permission.storage.request();
+    await Permission.location.request();
+    await Permission.audio.request();
+    await Permission.bluetooth.request();
+    await Permission.bluetoothConnect.request();
+    await Permission.phone.request();
+    await Permission.videos.request();
+    await Permission.nearbyWifiDevices.request();
+    await Permission.accessMediaLocation.request();
+    await Permission.manageExternalStorage.request();
   }
 
   @override

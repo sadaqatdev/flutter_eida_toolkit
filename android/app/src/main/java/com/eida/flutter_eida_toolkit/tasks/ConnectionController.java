@@ -32,6 +32,7 @@ import ae.emiratesid.idcard.toolkit.ToolkitException;
  */
 public class ConnectionController {
 
+
     private static CardReader cardReader = null;
     private static Toolkit toolkit = null;
 
@@ -39,9 +40,11 @@ public class ConnectionController {
         if (toolkit == null) {
             try {
                 String stringConfigPath = AppController.path;
+
                 Logger.d("VG URL ___initialize()" + AppController.VG_URL);
                 Logger.d("config Path____ " + stringConfigPath);
                 Logger.d("set configPath Success");
+
                 Context context = AppController.getContext();
                 StringBuilder configBuilder = new StringBuilder();
                 configBuilder.append("\n" + "config_directory =" + AppController.path);
@@ -54,9 +57,10 @@ public class ConnectionController {
                 }
                 String pluginDirectorPath = context.getApplicationInfo().nativeLibraryDir + "/";
                 configBuilder.append("\n" + "plugin_directory_path =" + pluginDirectorPath);
+
                 Logger.d("configBuilder ::" + configBuilder);
 
-//                GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
+//                 GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
 //                GrabbaFingerprintPlugin.getInstance(); // Required if Fingerprint scanning is needed
 
                 toolkit = new Toolkit(true, configBuilder.toString(), context);
@@ -69,6 +73,7 @@ public class ConnectionController {
             } catch (ToolkitException e) {
                 Logger.e("Exception occurred in initializing " + e.getLocalizedMessage());
                 throw e;
+
             }//catch()..
         }
         return true;
