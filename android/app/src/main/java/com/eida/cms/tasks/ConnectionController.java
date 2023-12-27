@@ -61,7 +61,7 @@ public class ConnectionController {
 
                 GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
 
-                GrabbaFingerprintPlugin.getInstance(); // Required if Fingerprint scanning is needed
+//                GrabbaFingerprintPlugin.getInstance(); // Required if Fingerprint scanning is needed
                 
                 toolkit = new Toolkit(true, configBuilder.toString(), context);
 //                GrabbaFingerprintPlugin.getInstance(); //  Required if Fingerprint scanning is needed

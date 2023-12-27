@@ -209,7 +209,7 @@ public class MainActivity extends FlutterActivity {
                     DataToSend.put("landPhoneNumber", cardPublicData.getHomeAddress().getResidentPhoneNumber());
                     DataToSend.put("cardHolderPhoto", cardPublicData.getCardHolderPhoto());
                     DataToSend.put("holderSignatureImage", cardPublicData.getHolderSignatureImage());
-                    eidaToolkitData.onCardReadComplete((long) status, message,DataToSend , result);
+                    eidaToolkitData.onCardReadComplete((long) status, message, DataToSend, result);
                     AppController.isReading = false;
 
                 }
@@ -230,12 +230,16 @@ public class MainActivity extends FlutterActivity {
     private final CardReaderConnectionTask.ConnectToolkitListener connectToolkitListener = new CardReaderConnectionTask.ConnectToolkitListener() {
         @Override
         public void onToolkitConnected(int status, boolean isConnectFlag, String message) {
+
             eidaToolkitData.onToolkitConnected((long) status, isConnectFlag, message, result);
+
             if (isConnectFlag) {
                 if (status == Constants.SUCCESS) {
 
                     ReaderCardDataAsync readerTask = new ReaderCardDataAsync(readerCardDataListener);
+
                     readerTask.execute();
+
 //                    postDataLog("onToolkitConnected", message);message
                     return;
                 }

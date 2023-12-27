@@ -92,10 +92,16 @@ class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              const SizedBox(
+                height: 20,
+              ),
               Text("Is Deveice connected ${isConnnete} "),
+              const SizedBox(
+                height: 20,
+              ),
               MaterialButton(
                 onPressed: () {
                   eidaToolkitConnect.connectAndInitializeF();
@@ -118,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
                 onPressed: () {
                   if (fingerData == null) {
                     ScaffoldMessenger.maybeOf(context)!.showSnackBar(
-                        SnackBar(content: Text("Select finger first")));
+                        const SnackBar(content: Text("Select finger first")));
                     return;
                   }
                   eidaToolkitConnect.onClickFingerVerifyF(
