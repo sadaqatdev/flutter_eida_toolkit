@@ -52,7 +52,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
   EidaToolkitConnect eidaToolkitConnect = EidaToolkitConnect();
 
-  List<(dynamic, String)> messages = [];
+  List<(dynamic, String?, dynamic)> messages = [];
+
+  bool? isConnnete = false;
+
+  FingerData? fingerData;
 
   @override
   void initState() {
@@ -91,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              Text("Is Deveice connected ${isConnnete} "),
               MaterialButton(
                 onPressed: () {
                   eidaToolkitConnect.connectAndInitializeF();
@@ -111,7 +116,13 @@ class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
               ),
               MaterialButton(
                 onPressed: () {
-                  eidaToolkitConnect.onClickFingerVerifyF();
+                  if (fingerData == null) {
+                    ScaffoldMessenger.maybeOf(context)!.showSnackBar(
+                        SnackBar(content: Text("Select finger first")));
+                    return;
+                  }
+                  eidaToolkitConnect.onClickFingerVerifyF(
+                      fingerData!.fingerId!, fingerData!.fingerIndex!.index);
                 },
                 child: const Text("onClickFingerVerifyF"),
               ),
@@ -171,44 +182,46 @@ class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
   }
 
   @override
-  void onBiometricVerify(int status, String message, String vgResponse) {
-    messages.add((status, message));
+  void onBiometricVerify(int? status, String? message, String? vgResponse) {
+    messages.add((status, message, vgResponse));
+  }
+
+  @override
+  void onCardReadComplete(
+      int? status, String? message, Map<String?, String?>? cardPublicData) {
+    messages.add((status, message, cardPublicData));
+  }
+
+  @override
+  void onCheckCardStatus(int? status, String? message, String? xmlString) {
+    messages.add((status, message, xmlString));
     if (mounted) setState(() {});
   }
 
   @override
-  void onCardReadComplete(int status, String message, String cardPublicData) {
-    messages.add((status, message));
+  void onFingerIndexFetched(
+      int? status, String? message, List<FingerData?>? fingers) {
+    messages.add((status, message, fingers?.length));
+    fingerData = fingers?.first;
     if (mounted) setState(() {});
   }
 
   @override
-  void onCheckCardStatus(int status, String message, String xmlString) {
-    messages.add((status, message));
+  void onToolkitConnected(int? status, bool? isConnectFlag, String? message) {
+    messages.add((status, message, isConnectFlag));
+    isConnnete = isConnectFlag;
     if (mounted) setState(() {});
   }
 
   @override
-  void onFingerIndexFetched(int status, String message, String fingers) {
-    messages.add((status, message));
+  void onToolkitInitialized(bool? isSuccessful, String? statusMessage) {
+    messages.add((isSuccessful, statusMessage, ''));
     if (mounted) setState(() {});
   }
 
   @override
-  void onToolkitConnected(int status, bool isConnectFlag, String message) {
-    messages.add((status, message));
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void onToolkitInitialized(bool isSuccessful, String statusMessage) {
-    messages.add((isSuccessful.toString(), statusMessage));
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void statusListener(String message) {
-    messages.add(("statusListener", message));
+  void statusListener(String? message) {
+    messages.add(("", message, ''));
     if (mounted) setState(() {});
   }
 }

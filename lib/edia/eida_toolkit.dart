@@ -25,6 +25,49 @@ List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty
   return <Object?>[error.code, error.message, error.details];
 }
 
+enum FingerIndex {
+  NONE,
+  NO_MEANING,
+  RIGHT_THUMB,
+  RIGHT_INDEX,
+  RIGHT_MIDDLE,
+  RIGHT_RING,
+  RIGHT_LITTLE,
+  LEFT_THUMB,
+  LEFT_INDEX,
+  LEFT_MIDDLE,
+  LEFT_RING,
+  LEFT_LITTLE,
+}
+
+class FingerData {
+  FingerData({
+    this.fingerId,
+    this.fingerIndex,
+  });
+
+  int? fingerId;
+
+  FingerIndex? fingerIndex;
+
+  Object encode() {
+    return <Object?>[
+      fingerId,
+      fingerIndex?.index,
+    ];
+  }
+
+  static FingerData decode(Object result) {
+    result as List<Object?>;
+    return FingerData(
+      fingerId: result[0] as int?,
+      fingerIndex: result[1] != null
+          ? FingerIndex.values[result[1]! as int]
+          : null,
+    );
+  }
+}
+
 class EidaToolkitConnect {
   /// Constructor for [EidaToolkitConnect].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
@@ -101,7 +144,7 @@ class EidaToolkitConnect {
     }
   }
 
-  Future<void> onClickFingerVerifyF() async {
+  Future<void> onClickFingerVerifyF(int fingerId, int fingerIndex) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitConnect.onClickFingerVerifyF';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -109,7 +152,7 @@ class EidaToolkitConnect {
       binaryMessenger: __pigeon_binaryMessenger,
     );
     final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(null) as List<Object?>?;
+        await __pigeon_channel.send(<Object?>[fingerId, fingerIndex]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -124,22 +167,45 @@ class EidaToolkitConnect {
   }
 }
 
+class _EidaToolkitDataCodec extends StandardMessageCodec {
+  const _EidaToolkitDataCodec();
+  @override
+  void writeValue(WriteBuffer buffer, Object? value) {
+    if (value is FingerData) {
+      buffer.putUint8(128);
+      writeValue(buffer, value.encode());
+    } else {
+      super.writeValue(buffer, value);
+    }
+  }
+
+  @override
+  Object? readValueOfType(int type, ReadBuffer buffer) {
+    switch (type) {
+      case 128: 
+        return FingerData.decode(readValue(buffer)!);
+      default:
+        return super.readValueOfType(type, buffer);
+    }
+  }
+}
+
 abstract class EidaToolkitData {
-  static const MessageCodec<Object?> pigeonChannelCodec = StandardMessageCodec();
+  static const MessageCodec<Object?> pigeonChannelCodec = _EidaToolkitDataCodec();
 
-  void onBiometricVerify(int status, String message, String vgResponse);
+  void onBiometricVerify(int? status, String? message, String? vgResponse);
 
-  void statusListener(String message);
+  void statusListener(String? message);
 
-  void onCardReadComplete(int status, String message, String cardPublicData);
+  void onCardReadComplete(int? status, String? message, Map<String?, String?>? cardPublicData);
 
-  void onFingerIndexFetched(int status, String message, String fingers);
+  void onFingerIndexFetched(int? status, String? message, List<FingerData?>? fingers);
 
-  void onCheckCardStatus(int status, String message, String xmlString);
+  void onCheckCardStatus(int? status, String? message, String? xmlString);
 
-  void onToolkitConnected(int status, bool isConnectFlag, String message);
+  void onToolkitConnected(int? status, bool? isConnectFlag, String? message);
 
-  void onToolkitInitialized(bool isSuccessful, String statusMessage);
+  void onToolkitInitialized(bool? isSuccessful, String? statusMessage);
 
   static void setup(EidaToolkitData? api, {BinaryMessenger? binaryMessenger}) {
     {
@@ -154,16 +220,10 @@ abstract class EidaToolkitData {
           'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onBiometricVerify was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final int? arg_status = (args[0] as int?);
-          assert(arg_status != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onBiometricVerify was null, expected non-null int.');
           final String? arg_message = (args[1] as String?);
-          assert(arg_message != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onBiometricVerify was null, expected non-null String.');
           final String? arg_vgResponse = (args[2] as String?);
-          assert(arg_vgResponse != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onBiometricVerify was null, expected non-null String.');
           try {
-            api.onBiometricVerify(arg_status!, arg_message!, arg_vgResponse!);
+            api.onBiometricVerify(arg_status, arg_message, arg_vgResponse);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -185,10 +245,8 @@ abstract class EidaToolkitData {
           'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.statusListener was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_message = (args[0] as String?);
-          assert(arg_message != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.statusListener was null, expected non-null String.');
           try {
-            api.statusListener(arg_message!);
+            api.statusListener(arg_message);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -210,16 +268,10 @@ abstract class EidaToolkitData {
           'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onCardReadComplete was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final int? arg_status = (args[0] as int?);
-          assert(arg_status != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onCardReadComplete was null, expected non-null int.');
           final String? arg_message = (args[1] as String?);
-          assert(arg_message != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onCardReadComplete was null, expected non-null String.');
-          final String? arg_cardPublicData = (args[2] as String?);
-          assert(arg_cardPublicData != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onCardReadComplete was null, expected non-null String.');
+          final Map<String?, String?>? arg_cardPublicData = (args[2] as Map<Object?, Object?>?)?.cast<String?, String?>();
           try {
-            api.onCardReadComplete(arg_status!, arg_message!, arg_cardPublicData!);
+            api.onCardReadComplete(arg_status, arg_message, arg_cardPublicData);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -241,16 +293,10 @@ abstract class EidaToolkitData {
           'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onFingerIndexFetched was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final int? arg_status = (args[0] as int?);
-          assert(arg_status != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onFingerIndexFetched was null, expected non-null int.');
           final String? arg_message = (args[1] as String?);
-          assert(arg_message != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onFingerIndexFetched was null, expected non-null String.');
-          final String? arg_fingers = (args[2] as String?);
-          assert(arg_fingers != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onFingerIndexFetched was null, expected non-null String.');
+          final List<FingerData?>? arg_fingers = (args[2] as List<Object?>?)?.cast<FingerData?>();
           try {
-            api.onFingerIndexFetched(arg_status!, arg_message!, arg_fingers!);
+            api.onFingerIndexFetched(arg_status, arg_message, arg_fingers);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -272,16 +318,10 @@ abstract class EidaToolkitData {
           'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onCheckCardStatus was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final int? arg_status = (args[0] as int?);
-          assert(arg_status != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onCheckCardStatus was null, expected non-null int.');
           final String? arg_message = (args[1] as String?);
-          assert(arg_message != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onCheckCardStatus was null, expected non-null String.');
           final String? arg_xmlString = (args[2] as String?);
-          assert(arg_xmlString != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onCheckCardStatus was null, expected non-null String.');
           try {
-            api.onCheckCardStatus(arg_status!, arg_message!, arg_xmlString!);
+            api.onCheckCardStatus(arg_status, arg_message, arg_xmlString);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -303,16 +343,10 @@ abstract class EidaToolkitData {
           'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onToolkitConnected was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final int? arg_status = (args[0] as int?);
-          assert(arg_status != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onToolkitConnected was null, expected non-null int.');
           final bool? arg_isConnectFlag = (args[1] as bool?);
-          assert(arg_isConnectFlag != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onToolkitConnected was null, expected non-null bool.');
           final String? arg_message = (args[2] as String?);
-          assert(arg_message != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onToolkitConnected was null, expected non-null String.');
           try {
-            api.onToolkitConnected(arg_status!, arg_isConnectFlag!, arg_message!);
+            api.onToolkitConnected(arg_status, arg_isConnectFlag, arg_message);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -334,13 +368,9 @@ abstract class EidaToolkitData {
           'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onToolkitInitialized was null.');
           final List<Object?> args = (message as List<Object?>?)!;
           final bool? arg_isSuccessful = (args[0] as bool?);
-          assert(arg_isSuccessful != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onToolkitInitialized was null, expected non-null bool.');
           final String? arg_statusMessage = (args[1] as String?);
-          assert(arg_statusMessage != null,
-              'Argument for dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onToolkitInitialized was null, expected non-null String.');
           try {
-            api.onToolkitInitialized(arg_isSuccessful!, arg_statusMessage!);
+            api.onToolkitInitialized(arg_isSuccessful, arg_statusMessage);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

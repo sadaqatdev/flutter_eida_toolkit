@@ -3,6 +3,9 @@
 
 package io.flutter.plugins;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.CLASS;
+
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,6 +14,8 @@ import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MessageCodec;
 import io.flutter.plugin.common.StandardMessageCodec;
 import java.io.ByteArrayOutputStream;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +67,97 @@ public class EidaToolkitPlugin {
     return new FlutterError("channel-error",  "Unable to establish connection on channel: " + channelName + ".", "");
   }
 
+  @Target(METHOD)
+  @Retention(CLASS)
+  @interface CanIgnoreReturnValue {}
+
+  public enum FingerIndex {
+    NONE(0),
+    NO_MEANING(1),
+    RIGHT_THUMB(2),
+    RIGHT_INDEX(3),
+    RIGHT_MIDDLE(4),
+    RIGHT_RING(5),
+    RIGHT_LITTLE(6),
+    LEFT_THUMB(7),
+    LEFT_INDEX(8),
+    LEFT_MIDDLE(9),
+    LEFT_RING(10),
+    LEFT_LITTLE(11);
+
+    final int index;
+
+    private FingerIndex(final int index) {
+      this.index = index;
+    }
+  }
+
+  /** Generated class from Pigeon that represents data sent in messages. */
+  public static final class FingerData {
+    private @Nullable Long fingerId;
+
+    public @Nullable Long getFingerId() {
+      return fingerId;
+    }
+
+    public void setFingerId(@Nullable Long setterArg) {
+      this.fingerId = setterArg;
+    }
+
+    private @Nullable FingerIndex fingerIndex;
+
+    public @Nullable FingerIndex getFingerIndex() {
+      return fingerIndex;
+    }
+
+    public void setFingerIndex(@Nullable FingerIndex setterArg) {
+      this.fingerIndex = setterArg;
+    }
+
+    public static final class Builder {
+
+      private @Nullable Long fingerId;
+
+      @CanIgnoreReturnValue
+      public @NonNull Builder setFingerId(@Nullable Long setterArg) {
+        this.fingerId = setterArg;
+        return this;
+      }
+
+      private @Nullable FingerIndex fingerIndex;
+
+      @CanIgnoreReturnValue
+      public @NonNull Builder setFingerIndex(@Nullable FingerIndex setterArg) {
+        this.fingerIndex = setterArg;
+        return this;
+      }
+
+      public @NonNull FingerData build() {
+        FingerData pigeonReturn = new FingerData();
+        pigeonReturn.setFingerId(fingerId);
+        pigeonReturn.setFingerIndex(fingerIndex);
+        return pigeonReturn;
+      }
+    }
+
+    @NonNull
+    ArrayList<Object> toList() {
+      ArrayList<Object> toListResult = new ArrayList<Object>(2);
+      toListResult.add(fingerId);
+      toListResult.add(fingerIndex == null ? null : fingerIndex.index);
+      return toListResult;
+    }
+
+    static @NonNull FingerData fromList(@NonNull ArrayList<Object> list) {
+      FingerData pigeonResult = new FingerData();
+      Object fingerId = list.get(0);
+      pigeonResult.setFingerId((fingerId == null) ? null : ((fingerId instanceof Integer) ? (Integer) fingerId : (Long) fingerId));
+      Object fingerIndex = list.get(1);
+      pigeonResult.setFingerIndex(fingerIndex == null ? null : FingerIndex.values()[(int) fingerIndex]);
+      return pigeonResult;
+    }
+  }
+
   /** Asynchronous error handling return type for non-nullable API method returns. */
   public interface Result<T> {
     /** Success case callback method for handling returns. */
@@ -87,7 +183,7 @@ public class EidaToolkitPlugin {
 
     void onClickLoadFingerDataF();
 
-    void onClickFingerVerifyF();
+    void onClickFingerVerifyF(@NonNull Long fingerId, @NonNull Long fingerIndex);
 
     /** The codec used by EidaToolkitConnect. */
     static @NonNull MessageCodec<Object> getCodec() {
@@ -169,8 +265,11 @@ public class EidaToolkitPlugin {
           channel.setMessageHandler(
               (message, reply) -> {
                 ArrayList<Object> wrapped = new ArrayList<Object>();
+                ArrayList<Object> args = (ArrayList<Object>) message;
+                Number fingerIdArg = (Number) args.get(0);
+                Number fingerIndexArg = (Number) args.get(1);
                 try {
-                  api.onClickFingerVerifyF();
+                  api.onClickFingerVerifyF((fingerIdArg == null) ? null : fingerIdArg.longValue(), (fingerIndexArg == null) ? null : fingerIndexArg.longValue());
                   wrapped.add(0, null);
                 }
  catch (Throwable exception) {
@@ -185,6 +284,33 @@ public class EidaToolkitPlugin {
       }
     }
   }
+
+  private static class EidaToolkitDataCodec extends StandardMessageCodec {
+    public static final EidaToolkitDataCodec INSTANCE = new EidaToolkitDataCodec();
+
+    private EidaToolkitDataCodec() {}
+
+    @Override
+    protected Object readValueOfType(byte type, @NonNull ByteBuffer buffer) {
+      switch (type) {
+        case (byte) 128:
+          return FingerData.fromList((ArrayList<Object>) readValue(buffer));
+        default:
+          return super.readValueOfType(type, buffer);
+      }
+    }
+
+    @Override
+    protected void writeValue(@NonNull ByteArrayOutputStream stream, Object value) {
+      if (value instanceof FingerData) {
+        stream.write(128);
+        writeValue(stream, ((FingerData) value).toList());
+      } else {
+        super.writeValue(stream, value);
+      }
+    }
+  }
+
   /** Generated class from Pigeon that represents Flutter messages that can be called from Java. */
   public static class EidaToolkitData {
     private final @NonNull BinaryMessenger binaryMessenger;
@@ -196,9 +322,9 @@ public class EidaToolkitPlugin {
     /** Public interface for sending reply. */ 
     /** The codec used by EidaToolkitData. */
     static @NonNull MessageCodec<Object> getCodec() {
-      return new StandardMessageCodec();
+      return EidaToolkitDataCodec.INSTANCE;
     }
-    public void onBiometricVerify(@NonNull Long statusArg, @NonNull String messageArg, @NonNull String vgResponseArg, @NonNull Result<Void> result) {
+    public void onBiometricVerify(@Nullable Long statusArg, @Nullable String messageArg, @Nullable String vgResponseArg, @NonNull Result<Void> result) {
       final String channelName = "dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onBiometricVerify";
       BasicMessageChannel<Object> channel =
           new BasicMessageChannel<>(
@@ -218,7 +344,7 @@ public class EidaToolkitPlugin {
             } 
           });
     }
-    public void statusListener(@NonNull String messageArg, @NonNull Result<Void> result) {
+    public void statusListener(@Nullable String messageArg, @NonNull Result<Void> result) {
       final String channelName = "dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.statusListener";
       BasicMessageChannel<Object> channel =
           new BasicMessageChannel<>(
@@ -238,7 +364,7 @@ public class EidaToolkitPlugin {
             } 
           });
     }
-    public void onCardReadComplete(@NonNull Long statusArg, @NonNull String messageArg, @NonNull String cardPublicDataArg, @NonNull Result<Void> result) {
+    public void onCardReadComplete(@Nullable Long statusArg, @Nullable String messageArg, @Nullable Map<String, String> cardPublicDataArg, @NonNull Result<Void> result) {
       final String channelName = "dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onCardReadComplete";
       BasicMessageChannel<Object> channel =
           new BasicMessageChannel<>(
@@ -258,7 +384,7 @@ public class EidaToolkitPlugin {
             } 
           });
     }
-    public void onFingerIndexFetched(@NonNull Long statusArg, @NonNull String messageArg, @NonNull String fingersArg, @NonNull Result<Void> result) {
+    public void onFingerIndexFetched(@Nullable Long statusArg, @Nullable String messageArg, @Nullable List<FingerData> fingersArg, @NonNull Result<Void> result) {
       final String channelName = "dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onFingerIndexFetched";
       BasicMessageChannel<Object> channel =
           new BasicMessageChannel<>(
@@ -278,7 +404,7 @@ public class EidaToolkitPlugin {
             } 
           });
     }
-    public void onCheckCardStatus(@NonNull Long statusArg, @NonNull String messageArg, @NonNull String xmlStringArg, @NonNull Result<Void> result) {
+    public void onCheckCardStatus(@Nullable Long statusArg, @Nullable String messageArg, @Nullable String xmlStringArg, @NonNull Result<Void> result) {
       final String channelName = "dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onCheckCardStatus";
       BasicMessageChannel<Object> channel =
           new BasicMessageChannel<>(
@@ -298,7 +424,7 @@ public class EidaToolkitPlugin {
             } 
           });
     }
-    public void onToolkitConnected(@NonNull Long statusArg, @NonNull Boolean isConnectFlagArg, @NonNull String messageArg, @NonNull Result<Void> result) {
+    public void onToolkitConnected(@Nullable Long statusArg, @Nullable Boolean isConnectFlagArg, @Nullable String messageArg, @NonNull Result<Void> result) {
       final String channelName = "dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onToolkitConnected";
       BasicMessageChannel<Object> channel =
           new BasicMessageChannel<>(
@@ -318,7 +444,7 @@ public class EidaToolkitPlugin {
             } 
           });
     }
-    public void onToolkitInitialized(@NonNull Boolean isSuccessfulArg, @NonNull String statusMessageArg, @NonNull Result<Void> result) {
+    public void onToolkitInitialized(@Nullable Boolean isSuccessfulArg, @Nullable String statusMessageArg, @NonNull Result<Void> result) {
       final String channelName = "dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitData.onToolkitInitialized";
       BasicMessageChannel<Object> channel =
           new BasicMessageChannel<>(

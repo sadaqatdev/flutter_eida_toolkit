@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import ae.emiratesid.idcard.toolkit.datamodel.CardPublicData;
 import ae.emiratesid.idcard.toolkit.datamodel.FingerData;
@@ -39,15 +41,10 @@ import io.flutter.plugins.EidaToolkitPlugin.Result;
 public class MainActivity extends FlutterActivity {
 
 
-    private final int REQUEST_TAKE_PHOTO = 1;
-
-
     JSONObject logs = new JSONObject();
 
+    private final Map<String, String> DataToSend = new HashMap<>();
 
-    private FingerData[] fingerList;
-
-    private FingerData fingerData;
 
     EidaToolkitPlugin.EidaToolkitData eidaToolkitData;
 
@@ -91,20 +88,9 @@ public class MainActivity extends FlutterActivity {
     private final GetFingerIndexAsync.GetFingerIndexListener getFingerIndexListener = new GetFingerIndexAsync.GetFingerIndexListener() {
         @Override
         public void onFingerIndexFetched(int status, String message, FingerData[] fingers) {
-            eidaToolkitData.onFingerIndexFetched((long) status, message, Arrays.toString(fingers), result);
+//            eidaToolkitData.onFingerIndexFetched((long) status, message, Arrays.stream(fingers).toArray(), result);
             AppController.isReading = false;
-            if (status == Constants.SUCCESS) {
 
-                fingerList = fingers;
-
-                String[] fingerData = {fingers[0].getFingerIndex() + "", fingers[1].getFingerIndex() + ""};
-
-            } else if (status == Constants.DISCONNECTED || status == Constants.DISCONNECTED2) {
-
-            } else {
-
-
-            }
         }
     };
 
@@ -116,24 +102,127 @@ public class MainActivity extends FlutterActivity {
         @Override
         public void onCardReadComplete(int status, String message, CardPublicData cardPublicData
         ) {
-            eidaToolkitData.onCardReadComplete((long) status, message, cardPublicData.toString(), result);
-            AppController.isReading = false;
 
-            if (status == Constants.SUCCESS && cardPublicData != null) {
+            try {
 
-                try {
+                if (status == Constants.SUCCESS && cardPublicData != null) {
 
-                    displayPhoto(cardPublicData);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    DataToSend.put("id_number", cardPublicData.getIdNumber());
+                    DataToSend.put("name_en", cardPublicData.getNonModifiablePublicData().getFullNameEnglish());
+                    DataToSend.put("nationality_en", cardPublicData.getNonModifiablePublicData().getNationalityEnglish());
+                    DataToSend.put("gender", cardPublicData.getNonModifiablePublicData().getGender());
+                    DataToSend.put("place_of_birth_en", cardPublicData.getNonModifiablePublicData().getPlaceOfBirthEnglish());
+                    DataToSend.put("date_of_birth", cardPublicData.getNonModifiablePublicData().getDateOfBirth());
+                    DataToSend.put("expiry_date", cardPublicData.getNonModifiablePublicData().getExpiryDate());
+                    DataToSend.put("issue_date", cardPublicData.getNonModifiablePublicData().getIssueDate());
+                    DataToSend.put("passport_number", cardPublicData.getModifiablePublicData().getPassportNumber());
+                    DataToSend.put("id_type", cardPublicData.getNonModifiablePublicData().getIDType());
+                    DataToSend.put("mother_name", cardPublicData.getModifiablePublicData().getMotherFullNameEnglish());
+                    DataToSend.put("card_number", cardPublicData.getCardNumber());
+                    DataToSend.put("image", cardPublicData.getCardHolderPhoto());
+                    DataToSend.put("sponsor_unified_number", cardPublicData.getModifiablePublicData().getSponsorUnifiedNumber());
+                    DataToSend.put("residency_number", cardPublicData.getModifiablePublicData().getResidencyNumber());
+                    DataToSend.put("residency_expiryDate", cardPublicData.getModifiablePublicData().getResidencyExpiryDate());
+                    DataToSend.put("signture", cardPublicData.getHolderSignatureImage());
+
+
+                    DataToSend.put("title", cardPublicData.getNonModifiablePublicData().getTitleEnglish());
+                    DataToSend.put("nationalityCode", cardPublicData.getNonModifiablePublicData().getNationalityCode());
+                    DataToSend.put("occupationCode", String.valueOf(cardPublicData.getModifiablePublicData().getOccupationCode()));
+                    DataToSend.put("occupationEnglish", cardPublicData.getModifiablePublicData().getOccupationEnglish());
+                    DataToSend.put("occupationTypeEnglish", cardPublicData.getModifiablePublicData().getOccupationTypeEnglish());
+                    DataToSend.put("occupationFieldCode", cardPublicData.getModifiablePublicData().getOccupationFieldCode());
+                    DataToSend.put("companyNameEnglish", cardPublicData.getModifiablePublicData().getCompanyNameEnglish());
+                    DataToSend.put("maritalStatusCode", cardPublicData.getModifiablePublicData().getMaritalStatusCode());
+                    DataToSend.put("residencyTypeCode", cardPublicData.getModifiablePublicData().getResidencyTypeCode());
+                    DataToSend.put("passportTypeCode", cardPublicData.getModifiablePublicData().getPassportTypeCode());
+                    DataToSend.put("passportCountryCode", cardPublicData.getModifiablePublicData().getPassportCountryCode());
+                    DataToSend.put("passportCountryEnglish", cardPublicData.getModifiablePublicData().getPassportCountryDescEnglish());
+                    DataToSend.put("passportIssueDate", cardPublicData.getModifiablePublicData().getPassportIssueDate());
+                    DataToSend.put("passportExpiryDate", cardPublicData.getModifiablePublicData().getPassportExpiryDate());
+                    DataToSend.put("fullNameArabic", cardPublicData.getNonModifiablePublicData().getFullNameArabic());
+
+                    DataToSend.put("CardSerialNumber", cardPublicData.getCardSerialNumber());
+                    DataToSend.put("HomeAddress", cardPublicData.getHomeAddress().getAreaDescEnglish());
+                    DataToSend.put("MobilePhoneNumber", cardPublicData.getHomeAddress().getMobilePhoneNumber());
+                    DataToSend.put("WorkAddress", cardPublicData.getWorkAddress().getAreaDescEnglish());
+                    DataToSend.put("CityDescEnglish", cardPublicData.getHomeAddress().getCityDescEnglish());
+                    DataToSend.put("AreaDescEnglish", cardPublicData.getHomeAddress().getAreaDescEnglish());
+                    DataToSend.put("BuildingNameEnglish", cardPublicData.getHomeAddress().getBuildingNameEnglish());
+
+
+                    DataToSend.put("husbandIdNumber", cardPublicData.getModifiablePublicData().getHusbandIDN());
+                    DataToSend.put("sponsorTypeCode", cardPublicData.getModifiablePublicData().getSponsorTypeCode());
+                    DataToSend.put("companyNameArabic", cardPublicData.getModifiablePublicData().getCompanyNameArabic());
+                    DataToSend.put("titleArabic", cardPublicData.getNonModifiablePublicData().getTitleArabic());
+                    DataToSend.put("titleEnglish", cardPublicData.getNonModifiablePublicData().getTitleEnglish());
+                    DataToSend.put("nationalityArabic", cardPublicData.getNonModifiablePublicData().getNationalityArabic());
+                    DataToSend.put("placeOfBirthArabic", cardPublicData.getNonModifiablePublicData().getPlaceOfBirthArabic());
+                    DataToSend.put("occupationArabic", cardPublicData.getModifiablePublicData().getOccupationArabic());
+                    DataToSend.put("familyId", cardPublicData.getModifiablePublicData().getFamilyID());
+                    DataToSend.put("occupationTypeArabic", cardPublicData.getModifiablePublicData().getOccupationArabic());
+                    DataToSend.put("sponsorName", cardPublicData.getModifiablePublicData().getSponsorName());
+                    DataToSend.put("passportCountryArabic", cardPublicData.getModifiablePublicData().getPassportCountryDescArabic());
+                    DataToSend.put("qualificationLevelCode", cardPublicData.getModifiablePublicData().getQualificationLevelCode());
+                    DataToSend.put("qualificationLevelArabic", cardPublicData.getModifiablePublicData().getQualificationLevelDescArabic());
+                    DataToSend.put("qualificationLevelEnglish", cardPublicData.getModifiablePublicData().getQualificationLevelDescEnglish());
+                    DataToSend.put("degreeDescriptionArabic", cardPublicData.getModifiablePublicData().getDegreeDescArabic());
+                    DataToSend.put("degreeDescriptionEnglish", cardPublicData.getModifiablePublicData().getDegreeDescEnglish());
+                    DataToSend.put("fieldOfStudyCode", String.valueOf(cardPublicData.getModifiablePublicData().getFieldOfStudyCode()));
+                    DataToSend.put("fieldOfStudyArabic", cardPublicData.getModifiablePublicData().getFieldOfStudyArabic());
+                    DataToSend.put("fieldOfStudyEnglish", cardPublicData.getModifiablePublicData().getFieldOfStudyEnglish());
+
+                    DataToSend.put("placeOfStudyEnglish", cardPublicData.getModifiablePublicData().getPlaceOfStudyEnglish());
+                    DataToSend.put("dateOfGraduation", cardPublicData.getModifiablePublicData().getDateOfGraduation());
+                    DataToSend.put("motherFullNameArabic", cardPublicData.getModifiablePublicData().getMotherFullNameArabic());
+                    DataToSend.put("motherFullNameEnglish", cardPublicData.getModifiablePublicData().getMotherFullNameEnglish());
+                    DataToSend.put("homeAddress", cardPublicData.getHomeAddress().getCityDescArabic());
+                    DataToSend.put("placeOfStudyArabic", cardPublicData.getModifiablePublicData().getPlaceOfStudyArabic());
+
+                    DataToSend.put("addressTypeCode", cardPublicData.getHomeAddress().getAddressTypeCode());
+                    DataToSend.put("locationCode", cardPublicData.getHomeAddress().getLocationCode());
+
+                    DataToSend.put("emiratesCode", cardPublicData.getHomeAddress().getEmiratesCode());
+                    DataToSend.put("emiratesDescArabic", cardPublicData.getHomeAddress().getEmiratesDescArabic());
+                    DataToSend.put("emiratesDescEnglish", cardPublicData.getHomeAddress().getEmiratesDescEnglish());
+
+                    DataToSend.put("cityDescArabic", cardPublicData.getHomeAddress().getCityDescArabic());
+                    DataToSend.put("cityDescEnglish", cardPublicData.getHomeAddress().getCityDescEnglish());
+                    DataToSend.put("streetArabic", cardPublicData.getHomeAddress().getStreetArabic());
+                    DataToSend.put("cityCode", cardPublicData.getHomeAddress().getCityCode());
+
+                    DataToSend.put("streetEnglish", cardPublicData.getHomeAddress().getStreetEnglish());
+                    DataToSend.put("pobox", cardPublicData.getHomeAddress().getPOBOX());
+                    DataToSend.put("areaCode", cardPublicData.getHomeAddress().getAreaCode());
+                    DataToSend.put("areaDescArabic", cardPublicData.getHomeAddress().getAreaDescArabic());
+                    DataToSend.put("areaDescEnglish", cardPublicData.getHomeAddress().getAreaDescEnglish());
+
+                    DataToSend.put("buildingNameArabic", cardPublicData.getHomeAddress().getBuildingNameArabic());
+                    DataToSend.put("buildingNameEnglish", cardPublicData.getHomeAddress().getBuildingNameEnglish());
+                    DataToSend.put("mobilePhoneNumber", cardPublicData.getHomeAddress().getAreaDescEnglish());
+
+                    DataToSend.put("email", cardPublicData.getHomeAddress().getEmail());
+                    DataToSend.put("flatNo", cardPublicData.getHomeAddress().getFlatNo());
+                    DataToSend.put("residentPhoneNumber", cardPublicData.getHomeAddress().getResidentPhoneNumber());
+                    DataToSend.put("workAddress", cardPublicData.getWorkAddress().getAreaDescEnglish());
+                    DataToSend.put("landPhoneNumber", cardPublicData.getHomeAddress().getResidentPhoneNumber());
+                    DataToSend.put("cardHolderPhoto", cardPublicData.getCardHolderPhoto());
+                    DataToSend.put("holderSignatureImage", cardPublicData.getHolderSignatureImage());
+                    eidaToolkitData.onCardReadComplete((long) status, message,DataToSend , result);
+                    AppController.isReading = false;
 
                 }
 
-            } else {
 
-                //
+                displayPhoto(cardPublicData);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
             }
+
+
         }
 
     };
@@ -170,7 +259,6 @@ public class MainActivity extends FlutterActivity {
         }
     };
 
-    private boolean isInitialized;
 
     private final InitializeToolkitTask.InitializationListener mInitializationListener =
             new InitializeToolkitTask.InitializationListener() {
@@ -179,9 +267,9 @@ public class MainActivity extends FlutterActivity {
                     //
                     eidaToolkitData.onToolkitInitialized(isSuccessful, statusMessage, result);
                     if (isSuccessful) {
-                        isInitialized = true;
+                        AppController.isInitialized = true;
                         ConnectCard();
-                        return;
+
                     }
 
 
@@ -189,17 +277,13 @@ public class MainActivity extends FlutterActivity {
             };
 
 
-    private String result_fail;
-    private String msg_fail;
-    private int fp_tries = 0;
-
     VerifyBiometricAsync.VerifyFingerprintListener verifyBiometricListener = new VerifyBiometricAsync.VerifyFingerprintListener() {
         @Override
         public void onBiometricVerify(int status, String message, String vgResponse) {
 
             eidaToolkitData.onBiometricVerify((long) status, message, vgResponse, result);
 
-            fp_tries = fp_tries + 1;
+
             if (status == Constants.SUCCESS) {
 
 
@@ -211,12 +295,6 @@ public class MainActivity extends FlutterActivity {
 
             }
 
-            try {
-                logs.put("attempt_" + fp_tries, message);
-//                postDataLog("attempt_" + fp_tries, message);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }//onBiometricVerify
     };
 
@@ -312,7 +390,7 @@ public class MainActivity extends FlutterActivity {
         getFingerIndexAsync.execute();
     }
 
-    public void onClickFingerVerify() {
+    public void onClickFingerVerify(FingerData fingerData) {
 
         VerifyBiometricAsync verifyBiometricAsync = new VerifyBiometricAsync(verifyBiometricListener, fingerData, 20);
 
@@ -337,7 +415,7 @@ public class MainActivity extends FlutterActivity {
 
     protected void Connect() {
 
-        if (!isInitialized) {
+        if (!AppController.isInitialized) {
             initialize();
         } else {
             ConnectCard();
@@ -381,8 +459,12 @@ public class MainActivity extends FlutterActivity {
         }
 
         @Override
-        public void onClickFingerVerifyF() {
-            onClickFingerVerify();
+        public void onClickFingerVerifyF(@NonNull Long fingerId, @NonNull Long fingerIndex) {
+
+
+            onClickFingerVerify(new FingerData((int) fingerId.intValue(), (int) fingerIndex.intValue()));
         }
+
+
     }
 }
