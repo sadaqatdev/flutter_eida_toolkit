@@ -115,7 +115,10 @@ public class MainActivity extends FlutterActivity {
             (status, message, xmlString) -> {
                 //
 
-                printL("checkCardStatusListener");
+                printL("checkCardStatusListener  " + message);
+                printL("checkCardStatusListener  " + status);
+                printL("checkCardStatusListener  " + xmlString);
+
 
                 eidaToolkitData.onCheckCardStatus((long) status, message, xmlString, result);
 
@@ -138,7 +141,10 @@ public class MainActivity extends FlutterActivity {
     private final GetFingerIndexAsync.GetFingerIndexListener getFingerIndexListener = new GetFingerIndexAsync.GetFingerIndexListener() {
         @Override
         public void onFingerIndexFetched(int status, String message, FingerData[] fingers) {
-            printL("onFingerIndexFetched");
+            printL("onFingerIndexFetched" + status);
+            printL("onFingerIndexFetched" + message);
+            printL("onFingerIndexFetched" + fingers.length);
+
 //            eidaToolkitData.onFingerIndexFetched((long) status, message, Arrays.stream(fingers).toArray(), result);
             AppController.isReading = false;
 
@@ -154,7 +160,10 @@ public class MainActivity extends FlutterActivity {
         public void onCardReadComplete(int status, String message, CardPublicData cardPublicData
         ) {
 
-            printL("onCardReadComplete");
+            printL("onCardReadComplete" + status);
+            printL("onCardReadComplete" + message);
+            printL("onCardReadComplete" + cardPublicData.getCardNumber());
+            printL("onCardReadComplete" + cardPublicData.getCardSerialNumber());
 
             try {
 
@@ -284,7 +293,9 @@ public class MainActivity extends FlutterActivity {
         @Override
         public void onToolkitConnected(int status, boolean isConnectFlag, String message) {
 
-            printL("onToolkitConnected");
+            printL("onToolkitConnected" + status);
+            printL("onToolkitConnected" + isConnectFlag);
+            printL("onToolkitConnected" + message);
 
             eidaToolkitData.onToolkitConnected((long) status, isConnectFlag, message, result);
 
@@ -324,7 +335,9 @@ public class MainActivity extends FlutterActivity {
                 @Override
                 public void onToolkitInitialized(boolean isSuccessful, String statusMessage) {
                     //
-                    printL("onToolkitInitialized");
+                    printL("onToolkitInitialized" + isSuccessful);
+                    printL("onToolkitInitialized" + statusMessage);
+
 
                     eidaToolkitData.onToolkitInitialized(isSuccessful, statusMessage, result);
 
@@ -343,7 +356,9 @@ public class MainActivity extends FlutterActivity {
         @Override
         public void onBiometricVerify(int status, String message, String vgResponse) {
 
-            printL("onBiometricVerify");
+            printL("onBiometricVerify" + status);
+            printL("onBiometricVerify" + message);
+            printL("onBiometricVerify" + vgResponse);
 
             eidaToolkitData.onBiometricVerify((long) status, message, vgResponse, result);
 
@@ -466,7 +481,7 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void initialize() {
-        printL("initialize");
+        printL("initialize call");
         InitializeToolkitTask initializeToolkitTask = new InitializeToolkitTask
                 (mInitializationListener);
 
@@ -474,7 +489,7 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void ConnectCard() {
-        printL("ConnectCard");
+        printL("ConnectCard call");
         CardReaderConnectionTask cardReaderConnectionTask = new CardReaderConnectionTask
                 (connectToolkitListener, true);
 
