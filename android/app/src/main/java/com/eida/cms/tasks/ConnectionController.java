@@ -59,12 +59,12 @@ public class ConnectionController {
 
                 Logger.d("configBuilder ::" + configBuilder);
 
-                GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
+//                GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
 
 //                GrabbaFingerprintPlugin.getInstance(); // Required if Fingerprint scanning is needed
-                
+
                 toolkit = new Toolkit(true, configBuilder.toString(), context);
-//                GrabbaFingerprintPlugin.getInstance(); //  Required if Fingerprint scanning is needed
+
                 Logger.d("Toolkit init success ");
                 CryptoUtils.setPublickey(toolkit.getDataProtectionKey().getPublicKey());
                 //this will give you the current version of toolkit.

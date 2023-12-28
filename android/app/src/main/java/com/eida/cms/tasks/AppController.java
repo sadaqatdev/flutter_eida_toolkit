@@ -9,7 +9,7 @@ import android.preference.PreferenceManager;
 
 import io.flutter.app.FlutterApplication;
 
-public class AppController extends FlutterApplication {
+public class AppController extends Application {
 
     public static String VG_URL = "";
 
@@ -29,6 +29,7 @@ public class AppController extends FlutterApplication {
         super.onCreate();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences
                 (getApplicationContext());
+
         String url = sharedPreferences.getString("VG_URL", "https://connect.tawzea.ae/ValidationGateway/Service");
 
         VG_URL = url.trim();

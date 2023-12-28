@@ -49,7 +49,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
+class _MyHomePageState extends State<MyHomePage> {
   EidaToolkitConnect eidaToolkitConnect = EidaToolkitConnect();
 
   List<(dynamic, String?, dynamic)> messages = [];
@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
 
   @override
   void initState() {
-    EidaToolkitData.setup(_MyHomePageState());
+    // EidaToolkitData.setup(_MyHomePageState());
     Future.delayed(Duration.zero).then((value) {
       getPermission();
     });

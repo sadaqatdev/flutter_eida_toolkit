@@ -25,7 +25,6 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
-
         android:name="com.eida.cms.tasks.AppController"
         android:icon="@mipmap/ic_launcher"
         android:label="flutter_eida_toolkit"
