@@ -2,6 +2,8 @@
 package com.eida.cms;
 
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
+
 import android.content.Intent;
 import android.provider.MediaStore;
 import android.util.Base64;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.eida.cms.tasks.AppController;
 import com.eida.cms.tasks.CardReaderConnectionTask;
@@ -31,9 +34,11 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ae.emiratesid.idcard.toolkit.datamodel.CardPublicData;
@@ -124,18 +129,7 @@ public class MainActivity extends FlutterActivity {
 
                 AppController.isReading = false;
 
-                if (status == Constants.SUCCESS) {
 
-                } else if (status == Constants.DISCONNECTED || status == Constants.DISCONNECTED2) {
-
-                } else {
-                    // config
-                }
-                try {
-                    logs.put("card_status", message);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
             };
 
     private final GetFingerIndexAsync.GetFingerIndexListener getFingerIndexListener = new GetFingerIndexAsync.GetFingerIndexListener() {
@@ -145,8 +139,24 @@ public class MainActivity extends FlutterActivity {
             printL("onFingerIndexFetched" + message);
             printL("onFingerIndexFetched" + fingers.length);
 
-//            eidaToolkitData.onFingerIndexFetched((long) status, message, Arrays.stream(fingers).toArray(), result);
-            AppController.isReading = false;
+            List<EidaToolkitPlugin.FingerData> fingersArg = new ArrayList<>();
+
+            if (status == Constants.SUCCESS) {
+
+                for (FingerData finger : fingers) {
+                    long ll = finger.getFingerId();
+                    EidaToolkitPlugin.FingerIndex f = EidaToolkitPlugin.FingerIndex.valueOf(finger.getFingerIndex().name());
+                    EidaToolkitPlugin.FingerData d = new EidaToolkitPlugin.FingerData();
+                    d.setFingerId(ll);
+                    d.setFingerIndex(f);
+                    fingersArg.add(d);
+                }
+
+                eidaToolkitData.onFingerIndexFetched((long) status, message, fingersArg, result);
+                AppController.isReading = false;
+
+            }
+
 
         }
     };
@@ -167,7 +177,7 @@ public class MainActivity extends FlutterActivity {
 
             try {
 
-                if (status == Constants.SUCCESS && cardPublicData != null) {
+                if (status == Constants.SUCCESS) {
 
 
                     DataToSend.put("id_number", cardPublicData.getIdNumber());
@@ -271,7 +281,9 @@ public class MainActivity extends FlutterActivity {
                     DataToSend.put("landPhoneNumber", cardPublicData.getHomeAddress().getResidentPhoneNumber());
                     DataToSend.put("cardHolderPhoto", cardPublicData.getCardHolderPhoto());
                     DataToSend.put("holderSignatureImage", cardPublicData.getHolderSignatureImage());
+
                     eidaToolkitData.onCardReadComplete((long) status, message, DataToSend, result);
+
                     AppController.isReading = false;
 
                 }
@@ -321,10 +333,6 @@ public class MainActivity extends FlutterActivity {
                 return;
             }
 
-            if (status == Constants.SUCCESS) {
-
-                return;
-            }
 
         }
     };
@@ -344,7 +352,6 @@ public class MainActivity extends FlutterActivity {
                     if (isSuccessful) {
                         AppController.isInitialized = true;
                         ConnectCard();
-
                     }
 
 
@@ -363,18 +370,7 @@ public class MainActivity extends FlutterActivity {
             eidaToolkitData.onBiometricVerify((long) status, message, vgResponse, result);
 
 
-            if (status == Constants.SUCCESS) {
-
-
-//                postDataLog("onBiometricVerifySuccess", vgResponse);
-            } else if (status == Constants.DISCONNECTED || status == Constants.DISCONNECTED2) {
-//                showDialog();
-//                postDataLog("carddisconnected", message);
-            } else {
-
-            }
-
-        }//onBiometricVerify
+        }
     };
 
 
@@ -459,9 +455,7 @@ public class MainActivity extends FlutterActivity {
             checkCardStatusAsync.execute();
 
         }//
-        else {
 
-        }
     }
 
     public void onClickLoadFingerData() {
