@@ -5,6 +5,7 @@ package com.eida.cms;
 import android.content.Intent;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,11 @@ import com.eida.cms.tasks.InitializeToolkitTask;
 import com.eida.cms.tasks.ReaderCardDataAsync;
 import com.eida.cms.tasks.ReaderCardDataListener;
 import com.eida.cms.tasks.VerifyBiometricAsync;
+import com.grabba.Grabba;
+import com.grabba.GrabbaBarcode;
+import com.grabba.GrabbaBarcodeListener;
+import com.grabba.GrabbaButtonListener;
+import com.grabba.GrabbaDriverNotInstalledException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,6 +64,45 @@ public class MainActivity extends FlutterActivity {
         @Override
         public void error(@NonNull Throwable error) {
 
+        }
+    };
+
+    private final GrabbaButtonListener buttonListener = new GrabbaButtonListener() {
+        @Override
+        public void grabbaRightButtonEvent(boolean pressed) {
+
+        }
+
+        @Override
+        public void grabbaLeftButtonEvent(boolean pressed) {
+
+        }
+    };
+
+    private final GrabbaBarcodeListener barcodeListener = new GrabbaBarcodeListener() {
+
+        public void barcodeTriggeredEvent() {
+        }
+
+        public void barcodeTimeoutEvent() {
+
+        }
+
+        public void barcodeScanningStopped() {
+
+        }
+
+        public void barcodeScannedEvent(String barcode, int symbologyType) {
+//            try {
+//                if (deliveryNoteIds.contains(barcode)) {
+//                    getData(barcode);
+//                    validateShipment();
+//                } else {
+//                    showToast("Shipment number: " + barcode + "," + "\nDoesn't exists for biometric delivery !");
+//                }
+//            } catch (Exception e) {
+//                showToast(e.getMessage());
+//            }
         }
     };
 
@@ -431,7 +476,20 @@ public class MainActivity extends FlutterActivity {
         super.configureFlutterEngine(flutterEngine);
         EidaToolkitPlugin.EidaToolkitConnect.setUp(flutterEngine.getDartExecutor().getBinaryMessenger(), new EidaToolkitConnectImpl());
         eidaToolkitData = new EidaToolkitPlugin.EidaToolkitData(flutterEngine.getDartExecutor().getBinaryMessenger());
+
         init();
+
+        try {
+            Grabba.open(getApplicationContext(), "bio");
+            Grabba.getInstance().addButtonListener(buttonListener);
+
+            GrabbaBarcode.getInstance().addEventListener(barcodeListener);
+        } catch (GrabbaDriverNotInstalledException e) {
+            Log.d("EID", "Error in open graba");
+            e.printStackTrace();
+        }
+
+
     }
 
     private void init() {

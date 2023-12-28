@@ -75,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> implements EidaToolkitData {
     await Permission.bluetooth.request();
     await Permission.bluetoothConnect.request();
     await Permission.phone.request();
+
     await Permission.videos.request();
     await Permission.nearbyWifiDevices.request();
     await Permission.accessMediaLocation.request();
