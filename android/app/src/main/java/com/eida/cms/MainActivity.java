@@ -129,7 +129,7 @@ public class MainActivity extends FlutterActivity {
                 } else if (status == Constants.DISCONNECTED || status == Constants.DISCONNECTED2) {
 
                 } else {
-
+                    // config
                 }
                 try {
                     logs.put("card_status", message);
@@ -482,10 +482,14 @@ public class MainActivity extends FlutterActivity {
 
     private void initialize() {
         printL("initialize call");
-        InitializeToolkitTask initializeToolkitTask = new InitializeToolkitTask
-                (mInitializationListener);
+        try {
+            InitializeToolkitTask initializeToolkitTask = new InitializeToolkitTask
+                    (mInitializationListener);
 
-        initializeToolkitTask.execute();
+            initializeToolkitTask.execute();
+        } catch (Exception e) {
+            printL("Error in initialize call");
+        }
     }
 
     private void ConnectCard() {
@@ -514,10 +518,11 @@ public class MainActivity extends FlutterActivity {
         init();
 
         try {
+
             Grabba.open(getApplicationContext(), "bio");
             Grabba.getInstance().addButtonListener(buttonListener);
-
             GrabbaBarcode.getInstance().addEventListener(barcodeListener);
+
         } catch (GrabbaDriverNotInstalledException e) {
             printL("Erro in graba device");
             e.printStackTrace();

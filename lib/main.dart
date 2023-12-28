@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -5,7 +7,16 @@ import 'edia/eida_toolkit.dart';
 
 var errorlist = [];
 
+bool? isConnnete = false;
+
+FingerData? fingerData;
+
+final StreamController<List<(dynamic, String?, dynamic)>> streamController =
+    StreamController<List<(dynamic, String?, dynamic)>>();
+
 void main() {
+  //
+
   PlatformDispatcher.instance.onError = (error, stack) {
     //
     errorlist.add(error);
@@ -16,10 +27,12 @@ void main() {
     print(stack);
     return true;
   };
+
   FlutterError.onError = (details) {
     print(details);
     errorlist.add(details);
   };
+
   runApp(const MyApp());
 }
 
@@ -50,24 +63,26 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  //
+
   EidaToolkitConnect eidaToolkitConnect = EidaToolkitConnect();
-
-  List<(dynamic, String?, dynamic)> messages = [];
-
-  bool? isConnnete = false;
-
-  FingerData? fingerData;
 
   @override
   void initState() {
-    // EidaToolkitData.setup(_MyHomePageState());
+    //
+
+    EidaToolkitData.setup(EdiaImpl());
+
     Future.delayed(Duration.zero).then((value) {
       getPermission();
     });
+
     super.initState();
   }
 
   getPermission() async {
+    //
+
     await Permission.camera.request();
     await Permission.storage.request();
     await Permission.location.request();
@@ -92,143 +107,164 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SingleChildScrollView(
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              const SizedBox(
-                height: 20,
-              ),
-              Text("Is Deveice connected ${isConnnete} "),
-              const SizedBox(
-                height: 20,
-              ),
-              MaterialButton(
-                onPressed: () {
-                  eidaToolkitConnect.connectAndInitializeF();
-                },
-                child: const Text("Connect and initialize"),
-              ),
-              MaterialButton(
-                onPressed: () {
-                  eidaToolkitConnect.onClickLoadFingerDataF();
-                },
-                child: const Text("onClickLoadFingerDataF"),
-              ),
-              MaterialButton(
-                onPressed: () {
-                  eidaToolkitConnect.onClickCheckCardStatusF();
-                },
-                child: const Text("onClickCheckCardStatusF"),
-              ),
-              MaterialButton(
-                onPressed: () {
-                  if (fingerData == null) {
-                    ScaffoldMessenger.maybeOf(context)!.showSnackBar(
-                        const SnackBar(content: Text("Select finger first")));
-                    return;
-                  }
-                  eidaToolkitConnect.onClickFingerVerifyF(
-                      fingerData!.fingerId!, fingerData!.fingerIndex!.index);
-                },
-                child: const Text("onClickFingerVerifyF"),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              const Text("Status Data"),
-              ListView.builder(
-                itemCount: messages.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return Row(
-                    children: [
-                      Text(
-                        "Status= ${messages[index].$1}",
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.black),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        "Message= ${messages[index].$2}",
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.black),
-                      ),
-                    ],
-                  );
-                },
-              ),
-              Row(
-                children: [
-                  const Text("Errors Data"),
-                  MaterialButton(
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    child: const Text("Refersh"),
-                  ),
-                ],
-              ),
-              ListView.builder(
-                itemCount: errorlist.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return Text(
-                    "Error= ${errorlist[index]}",
-                    style: const TextStyle(fontSize: 8, color: Colors.black),
-                  );
-                },
-              ),
-            ],
-          ),
+          child: StreamBuilder(
+              stream: streamController.stream,
+              builder: (context, snapshot) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text("Is Deveice connected ${isConnnete} "),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        eidaToolkitConnect.connectAndInitializeF();
+                      },
+                      child: const Text("Connect and initialize"),
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        eidaToolkitConnect.onClickLoadFingerDataF();
+                      },
+                      child: const Text("onClickLoadFingerDataF"),
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        eidaToolkitConnect.onClickCheckCardStatusF();
+                      },
+                      child: const Text("onClickCheckCardStatusF"),
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        if (fingerData == null) {
+                          ScaffoldMessenger.maybeOf(context)!.showSnackBar(
+                              const SnackBar(
+                                  content: Text("Select finger first")));
+                          return;
+                        }
+                        eidaToolkitConnect.onClickFingerVerifyF(
+                            fingerData!.fingerId!,
+                            fingerData!.fingerIndex!.index);
+                      },
+                      child: const Text("onClickFingerVerifyF"),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Text("Status Data"),
+                    ListView.builder(
+                      itemCount: snapshot.data?.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return Row(
+                          children: [
+                            Text(
+                              "Status= ${snapshot.data?[index].$1}",
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              "Message= ${snapshot.data?[index].$2}",
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black),
+                            ),
+                            Text(
+                              "Data= ${snapshot.data?[index].$3}",
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    Row(
+                      children: [
+                        const Text("Errors Data"),
+                        MaterialButton(
+                          onPressed: () {
+                            setState(() {});
+                          },
+                          child: const Text("Refersh"),
+                        ),
+                      ],
+                    ),
+                    ListView.builder(
+                      itemCount: errorlist.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return Text(
+                          "Error= ${errorlist[index]}",
+                          style:
+                              const TextStyle(fontSize: 8, color: Colors.black),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              }),
         ),
       ),
     );
   }
+}
 
+var m = [];
+
+class EdiaImpl extends EidaToolkitData {
   @override
   void onBiometricVerify(int? status, String? message, String? vgResponse) {
-    messages.add((status, message, vgResponse));
+    m.add([(status, message, vgResponse)]);
+    streamController.add([...m]);
   }
 
   @override
   void onCardReadComplete(
       int? status, String? message, Map<String?, String?>? cardPublicData) {
-    messages.add((status, message, cardPublicData));
+    m.add((status, message, cardPublicData));
+    streamController.add([...m]);
   }
 
   @override
   void onCheckCardStatus(int? status, String? message, String? xmlString) {
-    messages.add((status, message, xmlString));
-    if (mounted) setState(() {});
+    m.add((status, message, xmlString));
+    streamController.add([...m]);
   }
 
   @override
   void onFingerIndexFetched(
       int? status, String? message, List<FingerData?>? fingers) {
-    messages.add((status, message, fingers?.length));
+    m.add((status, message, fingers?.length));
+    streamController.add([...m]);
+
     fingerData = fingers?.first;
-    if (mounted) setState(() {});
+
+    // fingerData = fingers?.first;
   }
 
   @override
   void onToolkitConnected(int? status, bool? isConnectFlag, String? message) {
-    messages.add((status, message, isConnectFlag));
+    m.add((status, message, isConnectFlag));
+    streamController.add([...m]);
     isConnnete = isConnectFlag;
-    if (mounted) setState(() {});
   }
 
   @override
   void onToolkitInitialized(bool? isSuccessful, String? statusMessage) {
-    messages.add((isSuccessful, statusMessage, ''));
-    if (mounted) setState(() {});
+    m.add((isSuccessful, statusMessage, ''));
+    streamController.add([...m]);
   }
 
   @override
   void statusListener(String? message) {
-    messages.add(("", message, ''));
-    if (mounted) setState(() {});
+    m.add(("", message, ''));
+    streamController.add([...m]);
   }
 }
