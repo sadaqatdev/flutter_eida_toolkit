@@ -46,6 +46,10 @@ import io.flutter.plugins.EidaToolkitPlugin.Result;
 
 public class MainActivity extends FlutterActivity {
 
+    void printL(String msg) {
+        Log.d("EID", msg);
+    }
+
 
     JSONObject logs = new JSONObject();
 
@@ -111,6 +115,7 @@ public class MainActivity extends FlutterActivity {
             (status, message, xmlString) -> {
                 //
 
+                printL("checkCardStatusListener");
 
                 eidaToolkitData.onCheckCardStatus((long) status, message, xmlString, result);
 
@@ -133,6 +138,7 @@ public class MainActivity extends FlutterActivity {
     private final GetFingerIndexAsync.GetFingerIndexListener getFingerIndexListener = new GetFingerIndexAsync.GetFingerIndexListener() {
         @Override
         public void onFingerIndexFetched(int status, String message, FingerData[] fingers) {
+            printL("onFingerIndexFetched");
 //            eidaToolkitData.onFingerIndexFetched((long) status, message, Arrays.stream(fingers).toArray(), result);
             AppController.isReading = false;
 
@@ -147,6 +153,8 @@ public class MainActivity extends FlutterActivity {
         @Override
         public void onCardReadComplete(int status, String message, CardPublicData cardPublicData
         ) {
+
+            printL("onCardReadComplete");
 
             try {
 
@@ -276,6 +284,8 @@ public class MainActivity extends FlutterActivity {
         @Override
         public void onToolkitConnected(int status, boolean isConnectFlag, String message) {
 
+            printL("onToolkitConnected");
+
             eidaToolkitData.onToolkitConnected((long) status, isConnectFlag, message, result);
 
             if (isConnectFlag) {
@@ -314,7 +324,10 @@ public class MainActivity extends FlutterActivity {
                 @Override
                 public void onToolkitInitialized(boolean isSuccessful, String statusMessage) {
                     //
+                    printL("onToolkitInitialized");
+
                     eidaToolkitData.onToolkitInitialized(isSuccessful, statusMessage, result);
+
                     if (isSuccessful) {
                         AppController.isInitialized = true;
                         ConnectCard();
@@ -329,6 +342,8 @@ public class MainActivity extends FlutterActivity {
     VerifyBiometricAsync.VerifyFingerprintListener verifyBiometricListener = new VerifyBiometricAsync.VerifyFingerprintListener() {
         @Override
         public void onBiometricVerify(int status, String message, String vgResponse) {
+
+            printL("onBiometricVerify");
 
             eidaToolkitData.onBiometricVerify((long) status, message, vgResponse, result);
 
@@ -421,6 +436,8 @@ public class MainActivity extends FlutterActivity {
             //set the reading flag..
             AppController.isReading = true;
 
+            printL("OnClickCheckCardStatus");
+
 
             //create the object of ReaderCardDataAsync
             CheckCardStatusAsync checkCardStatusAsync = new CheckCardStatusAsync(checkCardStatusListener);
@@ -433,6 +450,8 @@ public class MainActivity extends FlutterActivity {
     }
 
     public void onClickLoadFingerData() {
+
+        printL("onClickLoadFingerData");
 
         GetFingerIndexAsync getFingerIndexAsync = new GetFingerIndexAsync(getFingerIndexListener);
 
@@ -447,7 +466,7 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void initialize() {
-
+        printL("initialize");
         InitializeToolkitTask initializeToolkitTask = new InitializeToolkitTask
                 (mInitializationListener);
 
@@ -455,7 +474,7 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void ConnectCard() {
-
+        printL("ConnectCard");
         CardReaderConnectionTask cardReaderConnectionTask = new CardReaderConnectionTask
                 (connectToolkitListener, true);
 
@@ -463,7 +482,7 @@ public class MainActivity extends FlutterActivity {
     }
 
     protected void Connect() {
-
+        printL("Connect");
         if (!AppController.isInitialized) {
             initialize();
         } else {
@@ -485,7 +504,7 @@ public class MainActivity extends FlutterActivity {
 
             GrabbaBarcode.getInstance().addEventListener(barcodeListener);
         } catch (GrabbaDriverNotInstalledException e) {
-            Log.d("EID", "Error in open graba");
+            printL("Erro in graba device");
             e.printStackTrace();
         }
 
