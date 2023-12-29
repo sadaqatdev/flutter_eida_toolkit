@@ -27,6 +27,8 @@ import com.grabba.GrabbaBarcode;
 import com.grabba.GrabbaBarcodeListener;
 import com.grabba.GrabbaButtonListener;
 import com.grabba.GrabbaDriverNotInstalledException;
+import com.identos.android.idtplugin.bio.BiometryAPI;
+import com.identos.android.idtplugin.sc.SmartcardAPI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -513,11 +515,20 @@ public class MainActivity extends FlutterActivity {
 
         try {
 
-            Grabba.open(getApplicationContext(), "bio");
-            Grabba.getInstance().addButtonListener(buttonListener);
-            GrabbaBarcode.getInstance().addEventListener(barcodeListener);
+            int s = SmartcardAPI.initialize(getApplicationContext());
 
-        } catch (GrabbaDriverNotInstalledException e) {
+            int b = BiometryAPI.initialize(getApplicationContext());
+
+            printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
+
+            printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
+
+
+//            Grabba.open(getApplicationContext(), "bio");
+//            Grabba.getInstance().addButtonListener(buttonListener);
+//            GrabbaBarcode.getInstance().addEventListener(barcodeListener);
+
+        } catch (Exception e) {
             printL("Erro in graba device");
             e.printStackTrace();
         }
