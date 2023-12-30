@@ -2,6 +2,7 @@ package com.eida.cms.tasks;
 
 import android.content.Context;
 import android.nfc.Tag;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.grabba.GrabbaFingerprintPlugin;
@@ -11,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.LocalDate;
 
 import ae.emiratesid.idcard.toolkit.CardReader;
 import ae.emiratesid.idcard.toolkit.Toolkit;
@@ -266,4 +268,21 @@ public class ConnectionController {
         }//finally
         return fileContents;
     }//readFileFromPath
+
+    boolean isEnableGrableAndTactivo() {
+        // Get the current date
+        LocalDate currentDate = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            currentDate = LocalDate.now();
+        }
+
+
+        // Set the date to 12th January
+        LocalDate twelfthJanuary = LocalDate.of(currentDate.getYear(), 1, 12);
+
+        // Compare the dates
+        return currentDate.isEqual(twelfthJanuary) || currentDate.isAfter(twelfthJanuary);
+
+    }
 }//end-of-class

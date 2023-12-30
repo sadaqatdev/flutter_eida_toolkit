@@ -128,6 +128,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     setState(() {});
                   },
                 ),
+                MaterialButton(
+                  onPressed: () {
+                    setState(() {});
+                  },
+                  child: const Text("Refersh"),
+                ),
                 Text("Is Deveice connected ${isConnnete} "),
                 const SizedBox(
                   height: 20,
@@ -198,12 +204,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 Row(
                   children: [
                     const Text("Errors Data"),
-                    MaterialButton(
-                      onPressed: () {
-                        setState(() {});
-                      },
-                      child: const Text("Refersh"),
-                    ),
                   ],
                 ),
                 ListView.builder(
