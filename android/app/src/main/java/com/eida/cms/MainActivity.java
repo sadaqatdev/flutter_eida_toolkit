@@ -550,25 +550,6 @@ public class MainActivity extends FlutterActivity {
 
         init();
 
-        try {
-
-            int s = SmartcardAPI.initialize(getApplicationContext());
-
-            int b = BiometryAPI.initialize(getApplicationContext());
-
-            printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
-
-            printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
-
-
-//            Grabba.open(getApplicationContext(), "bio");
-//            Grabba.getInstance().addButtonListener(buttonListener);
-//            GrabbaBarcode.getInstance().addEventListener(barcodeListener);
-
-        } catch (Exception e) {
-            printL("Erro in graba device");
-            e.printStackTrace();
-        }
 
 
     }
