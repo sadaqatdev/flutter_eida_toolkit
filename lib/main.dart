@@ -3,36 +3,23 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'edia/eida_toolkit.dart';
 
-var errorlist = [];
+final kNavig = GlobalKey<NavigatorState>();
 
-bool? isConnnete = false;
-
-FingerData? fingerData;
-
-var m = <(dynamic, dynamic, dynamic)>[];
+dp(msg, arg) {
+  debugPrint("${"Flutter side " + msg}+   $arg");
+}
 
 void main() {
   //
 
-  PlatformDispatcher.instance.onError = (error, stack) {
-    //
-    errorlist.add(error);
-
-    errorlist.add(stack);
-
-    print(error);
-    print(stack);
-    return true;
-  };
-
-  FlutterError.onError = (details) {
-    print(details);
-    errorlist.add(details);
-  };
-
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (BuildContext context) {
+        return DataProvider();
+      },
+      child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -43,12 +30,34 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      navigatorKey: kNavig,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
+  }
+}
+
+class DataProvider extends ChangeNotifier {
+  var errorlist = [];
+
+  bool? isConnnete = false;
+
+  FingerData? fingerData;
+
+  List<String?> m = [];
+  add(String? a, String? b, String? c) {
+    try {
+      m.add(a);
+      m.add(b);
+      m.add(c);
+      dp("Lenght ", m.length);
+      notifyListeners();
+    } catch (e, s) {
+      dp("Error in add $e", s);
+    }
   }
 }
 
@@ -74,13 +83,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     Future.delayed(const Duration(seconds: 2)).then((value) {
       getPermission();
-      m.add(("status", "message", "Data"));
     });
 
     super.initState();
   }
-
-  var m = [];
 
   getPermission() async {
     //
@@ -111,113 +117,89 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SingleChildScrollView(
         child: SizedBox(
             height: MediaQuery.of(context).size.height,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                DropdownButton(
-                  items: ['Grabba', 'Tacktivo']
-                      .map((e) => DropdownMenuItem(
-                            child: Text(e),
-                            value: e,
-                          ))
-                      .toList(),
-                  value: currentDevice,
-                  onChanged: (value) {
-                    currentDevice = value!;
-                    setState(() {});
-                  },
-                ),
-                MaterialButton(
-                  onPressed: () {
-                    setState(() {});
-                  },
-                  child: const Text("Refersh"),
-                ),
-                Text("Is Deveice connected ${isConnnete} "),
-                const SizedBox(
-                  height: 20,
-                ),
-                MaterialButton(
-                  onPressed: () {
-                    eidaToolkitConnect
-                        .connectAndInitializeF(currentDevice == "Grabba");
-                  },
-                  child: const Text("Connect and initialize"),
-                ),
-                MaterialButton(
-                  onPressed: () {
-                    eidaToolkitConnect.onClickLoadFingerDataF();
-                  },
-                  child: const Text("onClickLoadFingerDataF"),
-                ),
-                MaterialButton(
-                  onPressed: () {
-                    eidaToolkitConnect.onClickCheckCardStatusF();
-                  },
-                  child: const Text("onClickCheckCardStatusF"),
-                ),
-                MaterialButton(
-                  onPressed: () {
-                    if (fingerData == null) {
-                      ScaffoldMessenger.maybeOf(context)!.showSnackBar(
-                          const SnackBar(content: Text("Select finger first")));
-                      return;
-                    }
-                    eidaToolkitConnect.onClickFingerVerifyF(
-                        fingerData!.fingerId!, fingerData!.fingerIndex!.index);
-                  },
-                  child: const Text("onClickFingerVerifyF"),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const Text("Status Data"),
-                ListView.builder(
-                  itemCount: m.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return Row(
-                      children: [
-                        Text(
-                          "Status= ${m[index].$1}",
+            child: Consumer<DataProvider>(builder: (context, p, c) {
+              dp("Build this", p.m.length);
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  DropdownButton(
+                    items: ['Grabba', 'Tacktivo']
+                        .map((e) => DropdownMenuItem(
+                              child: Text(e),
+                              value: e,
+                            ))
+                        .toList(),
+                    value: currentDevice,
+                    onChanged: (value) {
+                      currentDevice = value!;
+                      setState(() {});
+                    },
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      setState(() {});
+                    },
+                    child: const Text("Refersh"),
+                  ),
+                  Text("Is Deveice connected ${p.isConnnete} "),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      eidaToolkitConnect
+                          .connectAndInitializeF(currentDevice == "Grabba");
+                    },
+                    child: const Text("Connect and initialize"),
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      eidaToolkitConnect.onClickLoadFingerDataF();
+                    },
+                    child: const Text("onClickLoadFingerDataF"),
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      eidaToolkitConnect.onClickCheckCardStatusF();
+                    },
+                    child: const Text("onClickCheckCardStatusF"),
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      if (p.fingerData == null) {
+                        ScaffoldMessenger.maybeOf(context)!.showSnackBar(
+                            const SnackBar(
+                                content: Text("Select finger first")));
+                        return;
+                      }
+                      eidaToolkitConnect.onClickFingerVerifyF(
+                          p.fingerData!.fingerId!,
+                          p.fingerData!.fingerIndex!.index);
+                    },
+                    child: const Text("onClickFingerVerifyF"),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text("Status Data"),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: p.m.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return Text(
+                          p.m[index]?.trim() ?? '',
                           style: const TextStyle(
                               fontSize: 14, color: Colors.black),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          "Message= ${m[index].$2}",
-                          style: const TextStyle(
-                              fontSize: 14, color: Colors.black),
-                        ),
-                        Text(
-                          "Data= ${m[index].$3}",
-                          style: const TextStyle(
-                              fontSize: 14, color: Colors.black),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                Row(
-                  children: [
-                    const Text("Errors Data"),
-                  ],
-                ),
-                ListView.builder(
-                  itemCount: errorlist.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return Text(
-                      "Error= ${errorlist[index]}",
-                      style: const TextStyle(fontSize: 8, color: Colors.black),
-                    );
-                  },
-                ),
-              ],
-            )),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            })),
       ),
     );
   }
@@ -226,50 +208,69 @@ class _MyHomePageState extends State<MyHomePage> {
 class EdiaImpl extends EidaToolkitData {
   @override
   void onBiometricVerify(int? status, String? message, String? vgResponse) {
-    m.add((status, message, vgResponse));
+    Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
+        .add(status.toString(), message.toString(), vgResponse.toString());
+    dp("onBiometricVerify", message);
     // streamController.add([...m]);
   }
 
   @override
   void onCardReadComplete(
       int? status, String? message, Map<String?, String?>? cardPublicData) {
-    m.add((status, message, cardPublicData));
+    Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
+        .add(status.toString(), message.toString(), cardPublicData.toString());
+    dp("onCardReadComplete", message);
     // streamController.add([...m]);
   }
 
   @override
   void onCheckCardStatus(int? status, String? message, String? xmlString) {
-    m.add((status, message, xmlString));
+    Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
+        .add(status.toString(), message.toString(), xmlString);
+    dp("onCheckCardStatus", message);
     // streamController.add([...m]);
   }
 
   @override
   void onFingerIndexFetched(
       int? status, String? message, List<FingerData?>? fingers) {
-    m.add((status, message, fingers?.length));
-    // streamController.add([...m]);
+    Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
+        .add(status.toString(), message.toString(), fingers?.length.toString());
 
-    fingerData = fingers?.first;
+    Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
+        .fingerData = fingers?.first;
 
     // fingerData = fingers?.first;
   }
 
   @override
   void onToolkitConnected(int? status, bool? isConnectFlag, String? message) {
-    m.add((status, message, isConnectFlag));
+    Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
+        .add(status.toString(), message.toString(), isConnectFlag.toString());
     // streamController.add([...m]);
-    isConnnete = isConnectFlag;
+    dp("onToolkitConnected", message);
+    Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
+        .isConnnete = isConnectFlag;
   }
 
   @override
   void onToolkitInitialized(bool? isSuccessful, String? statusMessage) {
-    m.add((isSuccessful, statusMessage, ''));
+    Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
+        .add(isSuccessful.toString(), statusMessage.toString(), '');
     // streamController.add([...m]);
+    dp("onToolkitInitialized", statusMessage);
   }
 
   @override
   void statusListener(String? message) {
-    m.add(("", message, ''));
+    dp("statusListener", message);
+    try {
+      Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
+          .add('', message?.toString(), '');
+    } catch (e, s) {
+      dp("Error in add $e ", s);
+    }
+
     // streamController.add([...m]);
   }
 }

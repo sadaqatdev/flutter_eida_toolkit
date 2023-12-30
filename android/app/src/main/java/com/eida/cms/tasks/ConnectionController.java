@@ -269,20 +269,5 @@ public class ConnectionController {
         return fileContents;
     }//readFileFromPath
 
-    boolean isEnableGrableAndTactivo() {
-        // Get the current date
-        LocalDate currentDate = null;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            currentDate = LocalDate.now();
-        }
-
-
-        // Set the date to 12th January
-        LocalDate twelfthJanuary = LocalDate.of(currentDate.getYear(), 1, 12);
-
-        // Compare the dates
-        return currentDate.isEqual(twelfthJanuary) || currentDate.isAfter(twelfthJanuary);
-
-    }
 }//end-of-class

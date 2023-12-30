@@ -66,13 +66,13 @@ public class MainActivity extends FlutterActivity {
 
     private final Map<String, String> DataToSend = new HashMap<>();
 
-
+    //    EidaToolkitPlugin.EidaToolkitData.
     EidaToolkitPlugin.EidaToolkitData eidaToolkitData;
 
-    Result result = new Result() {
 
+    Result<Void> result = new EidaToolkitPlugin.Result<Void>() {
         @Override
-        public void success(@NonNull Object result) {
+        public void success(@NonNull Void result) {
 
         }
 
@@ -497,44 +497,61 @@ public class MainActivity extends FlutterActivity {
                 GrabbaFingerprintPlugin.getInstance();
 
             } catch (GrabbaDriverNotInstalledException e) {
+                eidaToolkitData.statusListener(e.getMessage(), result);
                 e.printStackTrace();
             }
 
         } else {
 
-            int s = SmartcardAPI.initialize(getApplicationContext());
+            try {
+                int s = SmartcardAPI.initialize(getApplicationContext());
 
-            int b = BiometryAPI.initialize(getApplicationContext());
+                int b = BiometryAPI.initialize(getApplicationContext());
 
-            printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
+                printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
 
-            printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
+                printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
+            } catch (Exception e) {
+                eidaToolkitData.statusListener(e.getMessage(), result);
+            }
+
+
         }
 
     }
 
     private void initialize() {
         printL("initialize call");
+        eidaToolkitData.statusListener("initialize cal", result);
         try {
             InitializeToolkitTask initializeToolkitTask = new InitializeToolkitTask
                     (mInitializationListener);
 
             initializeToolkitTask.execute();
         } catch (Exception e) {
+            eidaToolkitData.statusListener("ConnectCard call", result);
             printL("Error in initialize call");
         }
     }
 
     private void ConnectCard() {
-        printL("ConnectCard call");
-        CardReaderConnectionTask cardReaderConnectionTask = new CardReaderConnectionTask
-                (connectToolkitListener, true);
 
-        cardReaderConnectionTask.execute();
+
+        try {
+            printL("ConnectCard call");
+            eidaToolkitData.statusListener("ConnectCard call", result);
+            CardReaderConnectionTask cardReaderConnectionTask = new CardReaderConnectionTask
+                    (connectToolkitListener, true);
+
+            cardReaderConnectionTask.execute();
+        } catch (Exception e) {
+            eidaToolkitData.statusListener("ConnectCard call", result);
+        }
     }
 
     protected void Connect() {
         printL("Connect");
+        eidaToolkitData.statusListener("Connect", result);
         if (!AppController.isInitialized) {
             initialize();
         } else {
@@ -549,7 +566,6 @@ public class MainActivity extends FlutterActivity {
         eidaToolkitData = new EidaToolkitPlugin.EidaToolkitData(flutterEngine.getDartExecutor().getBinaryMessenger());
 
         init();
-
 
 
     }
