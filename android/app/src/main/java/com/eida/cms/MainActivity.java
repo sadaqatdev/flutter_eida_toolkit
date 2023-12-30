@@ -27,6 +27,10 @@ import com.grabba.GrabbaBarcode;
 import com.grabba.GrabbaBarcodeListener;
 import com.grabba.GrabbaButtonListener;
 import com.grabba.GrabbaDriverNotInstalledException;
+import com.grabba.GrabbaFingerprintPlugin;
+import com.grabba.GrabbaSmartcardPlugin;
+import com.identos.android.idtplugin.bio.BiometryAPI;
+import com.identos.android.idtplugin.sc.SmartcardAPI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -474,6 +478,39 @@ public class MainActivity extends FlutterActivity {
         verifyBiometricAsync.execute();
     }
 
+    void initGrabba(boolean isGraba) {
+
+        if (isGraba) {
+
+            try {
+
+                Grabba.open(getApplicationContext(), "bio");
+
+                Grabba.getInstance().addButtonListener(buttonListener);
+
+                GrabbaBarcode.getInstance().addEventListener(barcodeListener);
+
+                GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
+
+                GrabbaFingerprintPlugin.getInstance();
+
+            } catch (GrabbaDriverNotInstalledException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+
+            int s = SmartcardAPI.initialize(getApplicationContext());
+
+            int b = BiometryAPI.initialize(getApplicationContext());
+
+            printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
+
+            printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
+        }
+
+    }
+
     private void initialize() {
         printL("initialize call");
         try {
@@ -511,16 +548,6 @@ public class MainActivity extends FlutterActivity {
 
         init();
 
-        try {
-
-            Grabba.open(getApplicationContext(), "bio");
-            Grabba.getInstance().addButtonListener(buttonListener);
-            GrabbaBarcode.getInstance().addEventListener(barcodeListener);
-
-        } catch (GrabbaDriverNotInstalledException e) {
-            printL("Erro in graba device");
-            e.printStackTrace();
-        }
 
 
     }
@@ -535,8 +562,12 @@ public class MainActivity extends FlutterActivity {
 
     public class EidaToolkitConnectImpl implements EidaToolkitPlugin.EidaToolkitConnect {
 
+
         @Override
-        public void connectAndInitializeF() {
+        public void connectAndInitializeF(@NonNull Boolean isGraba) {
+            //
+
+            initGrabba(isGraba);
 
             Connect();
 

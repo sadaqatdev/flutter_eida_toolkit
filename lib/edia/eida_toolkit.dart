@@ -78,7 +78,7 @@ class EidaToolkitConnect {
 
   static const MessageCodec<Object?> pigeonChannelCodec = StandardMessageCodec();
 
-  Future<void> connectAndInitializeF() async {
+  Future<void> connectAndInitializeF(bool isGraba) async {
     const String __pigeon_channelName = 'dev.flutter.pigeon.flutter_eida_toolkit.EidaToolkitConnect.connectAndInitializeF';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -86,7 +86,7 @@ class EidaToolkitConnect {
       binaryMessenger: __pigeon_binaryMessenger,
     );
     final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(null) as List<Object?>?;
+        await __pigeon_channel.send(<Object?>[isGraba]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {

@@ -177,7 +177,7 @@ public class EidaToolkitPlugin {
   /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
   public interface EidaToolkitConnect {
 
-    void connectAndInitializeF();
+    void connectAndInitializeF(@NonNull Boolean isGraba);
 
     void onClickCheckCardStatusF();
 
@@ -199,8 +199,10 @@ public class EidaToolkitPlugin {
           channel.setMessageHandler(
               (message, reply) -> {
                 ArrayList<Object> wrapped = new ArrayList<Object>();
+                ArrayList<Object> args = (ArrayList<Object>) message;
+                Boolean isGrabaArg = (Boolean) args.get(0);
                 try {
-                  api.connectAndInitializeF();
+                  api.connectAndInitializeF(isGrabaArg);
                   wrapped.add(0, null);
                 }
  catch (Throwable exception) {

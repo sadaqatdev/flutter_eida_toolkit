@@ -69,5 +69,6 @@ dependencies {
     implementation project(':grabba-plugin-release')
     implementation project(':EIDAToolkit')
     implementation project(':xmlsec2-release')
+    implementation ('net.java.dev.jna:jna:5.2.0@aar')
 
 }

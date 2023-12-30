@@ -9,15 +9,15 @@ class FingerData {
   });
 }
 
-class Constants {
-  final int SUCCESS = 0;
-  final int ERROR = 1;
-  final int DISCONNECTED = 245;
-  final int DISCONNECTED2 = 1000;
-  int CARD_VALID = 101;
-  int AUTH_CERT = 102;
-  int SIGN_CERT = 103;
-}
+// class Constants {
+//   final int SUCCESS = 0;
+//   final int ERROR = 1;
+//   final int DISCONNECTED = 245;
+//   final int DISCONNECTED2 = 1000;
+//   int CARD_VALID = 101;
+//   int AUTH_CERT = 102;
+//   int SIGN_CERT = 103;
+// }
 
 enum FingerIndex {
   NONE,
@@ -36,7 +36,7 @@ enum FingerIndex {
 
 @HostApi()
 abstract class EidaToolkitConnect {
-  void connectAndInitializeF();
+  void connectAndInitializeF(bool isGraba);
   void onClickCheckCardStatusF();
   void onClickLoadFingerDataF();
   void onClickFingerVerifyF(int fingerId, int fingerIndex);

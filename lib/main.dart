@@ -97,6 +97,8 @@ class _MyHomePageState extends State<MyHomePage> {
     await Permission.manageExternalStorage.request();
   }
 
+  String currentDevice = 'Grabba';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,8 +116,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    const SizedBox(
-                      height: 20,
+                    DropdownButton(
+                      items: ['Grabba', 'Tacktivo']
+                          .map((e) => DropdownMenuItem(
+                                child: Text(e),
+                                value: e,
+                              ))
+                          .toList(),
+                      value: currentDevice,
+                      onChanged: (value) {
+                        currentDevice = value!;
+                        setState(() {});
+                      },
                     ),
                     Text("Is Deveice connected ${isConnnete} "),
                     const SizedBox(
@@ -123,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     MaterialButton(
                       onPressed: () {
-                        eidaToolkitConnect.connectAndInitializeF();
+                        eidaToolkitConnect.connectAndInitializeF(false);
                       },
                       child: const Text("Connect and initialize"),
                     ),
