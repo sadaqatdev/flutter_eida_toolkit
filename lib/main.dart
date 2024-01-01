@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Tactivo Test'),
+      home: const MyHomePage(title: 'Graba Test 1'),
     );
   }
 }
@@ -250,7 +250,7 @@ class EdiaImpl extends EidaToolkitData {
     // streamController.add([...m]);
     dp("onToolkitConnected", message);
     Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
-        .isConnnete = isConnectFlag;
+        .add("$status", message, isConnectFlag.toString());
   }
 
   @override

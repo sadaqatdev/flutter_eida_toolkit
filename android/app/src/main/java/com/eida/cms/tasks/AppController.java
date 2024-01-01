@@ -9,7 +9,7 @@ import android.preference.PreferenceManager;
 
 import io.flutter.app.FlutterApplication;
 
-public class AppController extends FlutterApplication {
+public class AppController extends Application {
 
     public static String VG_URL = "";
 

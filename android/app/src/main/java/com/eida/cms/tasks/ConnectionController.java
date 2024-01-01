@@ -62,7 +62,7 @@ public class ConnectionController {
 
                 Logger.d("configBuilder ::" + configBuilder);
 
-//                GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
+                GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
 
 //                GrabbaFingerprintPlugin.getInstance(); // Required if Fingerprint scanning is needed
 

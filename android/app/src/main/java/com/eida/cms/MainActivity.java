@@ -482,25 +482,19 @@ public class MainActivity extends FlutterActivity {
 
     void initGrabba(boolean isGraba) {
 
-//        if (isGraba) {
+        try {
 
+            Grabba.open(getApplicationContext(), "bio");
 
-//        } else {
-//
-//            try {
-//                int s = SmartcardAPI.initialize(getApplicationContext());
-//
-//                int b = BiometryAPI.initialize(getApplicationContext());
-//
-//                printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
-//
-//                printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
-//            } catch (Exception e) {
-//                eidaToolkitData.statusListener(e.getMessage(), result);
-//            }
-//
-//
-//        }
+            Grabba.getInstance().addButtonListener(buttonListener);
+
+            GrabbaBarcode.getInstance().addEventListener(barcodeListener);
+
+        } catch (GrabbaDriverNotInstalledException e) {
+            eidaToolkitData.statusListener(e.getMessage(), result);
+            eidaToolkitData.statusListener("Grabaa not inilize error", result);
+            e.printStackTrace();
+        }
 
     }
 
@@ -551,30 +545,19 @@ public class MainActivity extends FlutterActivity {
 
         init();
 //
+
+
 //        try {
+//            int s = SmartcardAPI.initialize(getApplicationContext());
 //
-//            Grabba.open(getApplicationContext(), "bio");
+//            int b = BiometryAPI.initialize(getApplicationContext());
 //
-//            Grabba.getInstance().addButtonListener(buttonListener);
+//            printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
 //
-//            GrabbaBarcode.getInstance().addEventListener(barcodeListener);
-//
-//        } catch (GrabbaDriverNotInstalledException e) {
+//            printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
+//        } catch (Exception e) {
 //            eidaToolkitData.statusListener(e.getMessage(), result);
-//            e.printStackTrace();
 //        }
-
-        try {
-            int s = SmartcardAPI.initialize(getApplicationContext());
-
-            int b = BiometryAPI.initialize(getApplicationContext());
-
-            printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
-
-            printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
-        } catch (Exception e) {
-            eidaToolkitData.statusListener(e.getMessage(), result);
-        }
 
 
     }
