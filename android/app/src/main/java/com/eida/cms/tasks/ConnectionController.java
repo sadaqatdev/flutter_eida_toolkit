@@ -55,6 +55,7 @@ public class ConnectionController {
                 if (!TextUtils.isEmpty(AppController.VG_URL)) {
                     configBuilder.append("\n" + "vg_url =" + AppController.VG_URL);
                 }
+
                 String pluginDirectorPath = context.getApplicationInfo().nativeLibraryDir + "/";
 
                 configBuilder.append("\n" + "plugin_directory_path =" + pluginDirectorPath);

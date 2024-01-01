@@ -482,41 +482,25 @@ public class MainActivity extends FlutterActivity {
 
     void initGrabba(boolean isGraba) {
 
-        if (isGraba) {
-
-            try {
-
-                Grabba.open(getApplicationContext(), "bio");
-
-                Grabba.getInstance().addButtonListener(buttonListener);
-
-                GrabbaBarcode.getInstance().addEventListener(barcodeListener);
-
-                GrabbaSmartcardPlugin.getInstance();  // Required if Smartcard is needed
-
-                GrabbaFingerprintPlugin.getInstance();
-
-            } catch (GrabbaDriverNotInstalledException e) {
-                eidaToolkitData.statusListener(e.getMessage(), result);
-                e.printStackTrace();
-            }
-
-        } else {
-
-            try {
-                int s = SmartcardAPI.initialize(getApplicationContext());
-
-                int b = BiometryAPI.initialize(getApplicationContext());
-
-                printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
-
-                printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
-            } catch (Exception e) {
-                eidaToolkitData.statusListener(e.getMessage(), result);
-            }
+//        if (isGraba) {
 
 
-        }
+//        } else {
+//
+//            try {
+//                int s = SmartcardAPI.initialize(getApplicationContext());
+//
+//                int b = BiometryAPI.initialize(getApplicationContext());
+//
+//                printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
+//
+//                printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
+//            } catch (Exception e) {
+//                eidaToolkitData.statusListener(e.getMessage(), result);
+//            }
+//
+//
+//        }
 
     }
 
@@ -566,6 +550,31 @@ public class MainActivity extends FlutterActivity {
         eidaToolkitData = new EidaToolkitPlugin.EidaToolkitData(flutterEngine.getDartExecutor().getBinaryMessenger());
 
         init();
+//
+//        try {
+//
+//            Grabba.open(getApplicationContext(), "bio");
+//
+//            Grabba.getInstance().addButtonListener(buttonListener);
+//
+//            GrabbaBarcode.getInstance().addEventListener(barcodeListener);
+//
+//        } catch (GrabbaDriverNotInstalledException e) {
+//            eidaToolkitData.statusListener(e.getMessage(), result);
+//            e.printStackTrace();
+//        }
+
+        try {
+            int s = SmartcardAPI.initialize(getApplicationContext());
+
+            int b = BiometryAPI.initialize(getApplicationContext());
+
+            printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
+
+            printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
+        } catch (Exception e) {
+            eidaToolkitData.statusListener(e.getMessage(), result);
+        }
 
 
     }
