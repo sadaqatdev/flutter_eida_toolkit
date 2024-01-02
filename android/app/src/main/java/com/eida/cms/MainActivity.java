@@ -288,14 +288,14 @@ public class MainActivity extends FlutterActivity {
                     DataToSend.put("cardHolderPhoto", cardPublicData.getCardHolderPhoto());
                     DataToSend.put("holderSignatureImage", cardPublicData.getHolderSignatureImage());
 
-                    eidaToolkitData.onCardReadComplete((long) status, message, DataToSend, result);
+                    eidaToolkitData.onCardReadComplete(0l, "Card read", DataToSend, result);
 
                     AppController.isReading = false;
 
                 }
 
 
-                displayPhoto(cardPublicData);
+//                displayPhoto(cardPublicData);
 
             } catch (Exception e) {
                 e.printStackTrace();

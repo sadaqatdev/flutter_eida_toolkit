@@ -217,8 +217,11 @@ class EdiaImpl extends EidaToolkitData {
   @override
   void onCardReadComplete(
       int? status, String? message, Map<String?, String?>? cardPublicData) {
-    Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
-        .add(status.toString(), message.toString(), cardPublicData.toString());
+    cardPublicData!.forEach((e, f) {
+      Provider.of<DataProvider>(kNavig.currentState!.context, listen: false)
+          .add(status.toString(), message.toString(), f ?? '');
+    });
+
     dp("onCardReadComplete", message);
     // streamController.add([...m]);
   }
