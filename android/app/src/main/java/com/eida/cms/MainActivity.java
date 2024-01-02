@@ -315,7 +315,7 @@ public class MainActivity extends FlutterActivity {
             printL("onToolkitConnected" + isConnectFlag);
             printL("onToolkitConnected" + message);
 
-            eidaToolkitData.onToolkitConnected((long) status, isConnectFlag, message, result);
+            eidaToolkitData.onToolkitConnected((long) status, isConnectFlag, message == null ? "" : message, result);
 
             if (isConnectFlag) {
                 if (status == Constants.SUCCESS) {
@@ -353,7 +353,7 @@ public class MainActivity extends FlutterActivity {
                     printL("onToolkitInitialized" + statusMessage);
 
 
-                    eidaToolkitData.onToolkitInitialized(isSuccessful, statusMessage, result);
+                    eidaToolkitData.onToolkitInitialized(isSuccessful, statusMessage == null ? "" : statusMessage, result);
 
                     if (isSuccessful) {
                         AppController.isInitialized = true;
@@ -373,7 +373,7 @@ public class MainActivity extends FlutterActivity {
             printL("onBiometricVerify" + message);
             printL("onBiometricVerify" + vgResponse);
 
-            eidaToolkitData.onBiometricVerify((long) status, message, vgResponse, result);
+            eidaToolkitData.onBiometricVerify((long) status, message == null ? "" : message, vgResponse, result);
 
 
         }
@@ -496,6 +496,19 @@ public class MainActivity extends FlutterActivity {
             e.printStackTrace();
         }
 
+
+        //        try {
+//            int s = SmartcardAPI.initialize(getApplicationContext());
+//
+//            int b = BiometryAPI.initialize(getApplicationContext());
+//
+//            printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
+//
+//            printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
+//        } catch (Exception e) {
+//            eidaToolkitData.statusListener(e.getMessage(), result);
+//        }
+
     }
 
     private void initialize() {
@@ -545,19 +558,6 @@ public class MainActivity extends FlutterActivity {
 
         init();
 //
-
-
-//        try {
-//            int s = SmartcardAPI.initialize(getApplicationContext());
-//
-//            int b = BiometryAPI.initialize(getApplicationContext());
-//
-//            printL(" Smartcard API   card init if print 0 initialize ele not = " + s);
-//
-//            printL(" BiometryAPI   card init if print 0 initialize ele not = " + b);
-//        } catch (Exception e) {
-//            eidaToolkitData.statusListener(e.getMessage(), result);
-//        }
 
 
     }

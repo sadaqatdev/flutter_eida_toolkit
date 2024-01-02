@@ -45,19 +45,33 @@ class DataProvider extends ChangeNotifier {
 
   bool? isConnnete = false;
 
+  ScrollController scrollController = ScrollController();
+
   FingerData? fingerData;
 
   List<String?> m = [];
-  add(String? a, String? b, String? c) {
+  add(String? a, String? b, String? c) async {
     try {
       m.add(a);
       m.add(b);
       m.add(c);
       dp("Lenght ", m.length);
+
       notifyListeners();
+      await Future.delayed(Duration.zero);
+      scrollDown();
     } catch (e, s) {
       dp("Error in add $e", s);
     }
+  }
+
+  scrollDown() {
+    scrollController.animateTo(
+      scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeInOut,
+    );
+    notifyListeners();
   }
 }
 
@@ -114,12 +128,12 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: SingleChildScrollView(
-        child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: Consumer<DataProvider>(builder: (context, p, c) {
-              dp("Build this", p.m.length);
-              return Column(
+      body: Consumer<DataProvider>(builder: (context, p, c) {
+        return SingleChildScrollView(
+          controller: p.scrollController,
+          child: SizedBox(
+              height: MediaQuery.of(context).size.height,
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
@@ -198,9 +212,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ],
-              );
-            })),
-      ),
+              )),
+        );
+      }),
     );
   }
 }
