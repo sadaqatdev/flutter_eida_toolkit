@@ -300,6 +300,8 @@ public class MainActivity extends FlutterActivity {
             } catch (Exception e) {
                 e.printStackTrace();
 
+                eidaToolkitData.statusListener(e.getMessage(), result);
+
             }
 
 
@@ -324,19 +326,9 @@ public class MainActivity extends FlutterActivity {
 
                     readerTask.execute();
 
-//                    postDataLog("onToolkitConnected", message);message
-                    return;
                 }
 
-                if (message.equals("Failed to establish connection with smartcard")) {
 
-
-                } else if (message.equals("Invalid handle value")) {
-
-                } else {
-
-                }
-                return;
             }
 
 
